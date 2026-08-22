@@ -3,14 +3,16 @@ import '../widgets/gitsawe_app_bar.dart';
 import '../widgets/app_sidebar.dart';
 import '../core/theme/app_theme.dart';
 
+import '../widgets/screen_wrapper.dart';
+
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const GitsaweAppBar(title: 'About'),
-      drawer: const AppSidebar(currentIndex: -1),
+    return ScreenWrapper(
+      currentIndex: -1,
+      title: 'About',
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(

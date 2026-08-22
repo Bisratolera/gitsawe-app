@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+// import 'package:gitsawe/models/audio.dart';
+import 'package:gitsawe/screen/audio_library_screen.dart';
 import '../core/theme/app_theme.dart';
 import '../screen/today_screen.dart';
 import '../screen/calendar_screen.dart';
 import '../screen/mahlet_screen.dart';
 import '../screen/search_screen.dart';
-import '../screen/more_screen.dart';
 import '../screen/bookmarks_screen.dart';
 import '../screen/settings_screen.dart';
 import '../screen/about_screen.dart';
+import '../screen/more_screen.dart';
 
 class AppSidebar extends StatelessWidget {
   final int currentIndex;
@@ -22,33 +24,47 @@ class AppSidebar extends StatelessWidget {
           DrawerHeader(
             decoration: const BoxDecoration(
               color: AppColors.maroon,
-            ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    'assets/images/splash.png',
-                    height: 60,
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'ግጻዌ',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Text(
-                    'Gitsawe Lectionary',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
+              image: DecorationImage(
+                image: AssetImage('assets/images/splash.png'),
+                opacity: 0.1,
+                alignment: Alignment.centerRight,
+                scale: 0.5,
               ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Image.asset(
+                    'assets/images/splash.png',
+                    height: 40,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'ግጻዌ',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                  ),
+                ),
+                const Text(
+                  'Gitsawe Lectionary',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    letterSpacing: 2,
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -57,28 +73,28 @@ class AppSidebar extends StatelessWidget {
               children: [
                 _buildNavItem(
                   context,
-                  icon: Icons.today,
+                  icon: Icons.today_outlined,
                   label: 'ዛሬ',
                   index: 0,
                   destination: const TodayScreen(),
                 ),
                 _buildNavItem(
                   context,
-                  icon: Icons.calendar_month,
+                  icon: Icons.calendar_month_outlined,
                   label: 'የወር',
                   index: 1,
                   destination: const CalendarScreen(),
                 ),
                 _buildNavItem(
                   context,
-                  icon: Icons.music_note,
+                  icon: Icons.music_note_outlined,
                   label: 'ማኅሌት',
                   index: 2,
                   destination: const MahletScreen(),
                 ),
                 _buildNavItem(
                   context,
-                  icon: Icons.search,
+                  icon: Icons.search_outlined,
                   label: 'ፍለጋ',
                   index: 3,
                   destination: const SearchScreen(),
@@ -86,22 +102,34 @@ class AppSidebar extends StatelessWidget {
                 const Divider(),
                 _buildNavItem(
                   context,
-                  icon: Icons.bookmarks,
+                  icon: Icons.bookmarks_outlined,
                   label: 'የእኔ (Bookmarks)',
                   destination: const BookmarksScreen(),
                 ),
                 _buildNavItem(
                   context,
-                  icon: Icons.settings,
+                  icon: Icons.settings_outlined,
                   label: 'Settings',
                   destination: const SettingsScreen(),
                 ),
                 _buildNavItem(
                   context,
-                  icon: Icons.info_outline,
+                  icon: Icons.info_outlined,
                   label: 'About',
                   destination: const AboutScreen(),
                 ),
+                _buildNavItem(
+                  context,
+                  icon: Icons.more_horiz_outlined,
+                  label: 'More',
+                  destination: const MoreScreen(),
+                ),
+                _buildNavItem(
+                  context,
+                  icon: Icons.library_music_outlined,
+                  label: 'Audio Library',
+                  destination: const AudioLibraryScreen(),
+                )
               ],
             ),
           ),

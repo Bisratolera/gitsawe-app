@@ -42,6 +42,12 @@ dependencies:
   flutter_timezone: ^5.1.0
   http: ^1.6.0
   # share_plus: ^13.3.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  # connectivity_plus: ^5.0.0 # To check internet connection
+  shared_preferences: ^2.2.2
+  just_audio: ^0.10.6
+  crypto: ^3.0.7
 
 dev_dependencies:
   flutter_test:
@@ -64,15 +70,20 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  # Reading data (daily/monthly/seasonal gitsawe, feasts, mahlets, audio,
+  # sinksar) now comes from the live API at gitsawe-web.lovable.app instead
+  # of being bundled — see lib/services/api_client.dart and
+  # lib/services/gitsawe_service.dart. Only static app assets remain here.
   assets:
-  - assets/data/dailyGitsawe.json
-  - assets/data/feasts.json
-  - assets/data/mahlets.json
-  - assets/data/monthlyGitsawe.json
-  - assets/data/months.json
-  - assets/data/seasonalGitsawe.json
-  - assets/data/subFeasts.json
+  - assets/data/audio.json
+  - assets/data/audioCategories.json
+  - assets/data/audioKidassie.json
+  - assets/data/audioBooks.json
+  - assets/data/sinksar/
   - assets/images/splash.png
+  - assets/images/onboard1.png
+  - assets/images/onboard2.png
+  - assets/images/onboard3.png
   - assets/fonts/NotoSansEthiopic.ttf
 
   fonts:
@@ -123,11 +134,13 @@ flutter_native_splash:
   web: false
   android_gravity: center
   ios_content_mode: center
+  size: 200
 
   # Add this section for Android 12 and newer devices:
   android_12:
     color: "#2B1620"
     image: assets/images/splash.png
+    size: 200
 
 flutter_launcher_icons:
   android: "launcher_icon"

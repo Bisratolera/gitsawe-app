@@ -46,3 +46,14 @@ class EthiopianDate {
   String get dateKey =>
       '${day.toString().padLeft(2, '0')}-${month.toString().padLeft(2, '0')}';
 }
+
+const List<String> _geezOnes = ["", "፩", "፪", "፫", "፬", "፭", "፮", "፯", "፰", "፱"];
+const List<String> _geezTens = ["", "፲", "፳", "፴", "፵", "፶", "፷", "፸", "፹", "፺"];
+
+/// Converts a standard Hindu-Arabic numeral (1, 2, 3...) to a Ge'ez
+/// numeral string for display.
+String toGeezNumber(int n) {
+  if (n <= 0) return n.toString();
+  if (n >= 100) return n.toString(); // simplistic implementation for daily use
+  return (_geezTens[n ~/ 10]) + (_geezOnes[n % 10]);
+}

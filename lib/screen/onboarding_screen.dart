@@ -17,18 +17,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<OnboardingData> _pages = [
     OnboardingData(
       title: 'እንኳን ደህና መጡ',
-      description: 'ወደ ግጻዌ መተግበሪያ እንኳን በደህና መጡ። የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን የዕለት ንባባትን እዚህ ያገኛሉ።',
-      image: 'assets/images/splash.png',
+      description:
+          'ወደ ግጻዌ መተግበሪያ እንኳን በደህና መጡ። የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን የዕለት ንባባትን እዚህ ያገኛሉ።',
+      image: 'assets/images/onboard1.png',
     ),
     OnboardingData(
       title: 'የዕለት ንባባት',
       description: 'ምስባክ፣ ወንጌል፣ ቅዳሴና ስንክሳርን በየቀኑ በቀላሉ ይከታተሉ።',
-      image: 'assets/images/splash.png',
+      image: 'assets/images/onboard2.png',
     ),
     OnboardingData(
       title: 'ማኅሌትና በዓላት',
       description: 'የወር በዓላትንና የማኅሌት ሥርዓታትን በማንኛውም ጊዜ ይመልከቱ።',
-      image: 'assets/images/splash.png',
+      image: 'assets/images/onboard3.png',
     ),
   ];
 
@@ -45,6 +46,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.maroon,
       body: Stack(
         children: [
           PageView.builder(
@@ -90,8 +92,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.maroon,
-                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.white,
+                        foregroundColor: AppColors.maroon,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -107,7 +109,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   onPressed: _completeOnboarding,
                   child: const Text(
                     'ዝለል (Skip)',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: AppColors.maroon),
                   ),
                 ),
               ],
@@ -125,7 +127,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       margin: const EdgeInsets.only(right: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
-        color: _currentPage == index ? AppColors.maroon : Colors.grey[300],
+        color: _currentPage == index ? Colors.white : AppColors.maroon,
       ),
     );
   }
@@ -155,17 +157,14 @@ class _OnboardingPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            data.image,
-            height: 200,
-          ),
+          Image.asset(data.image, height: 200),
           const SizedBox(height: 40),
           Text(
             data.title,
             style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: AppColors.maroon,
+              color: Colors.white,
             ),
             textAlign: TextAlign.center,
           ),
@@ -174,7 +173,7 @@ class _OnboardingPage extends StatelessWidget {
             data.description,
             style: const TextStyle(
               fontSize: 16,
-              color: Colors.black54,
+              color: Colors.white,
               height: 1.5,
             ),
             textAlign: TextAlign.center,

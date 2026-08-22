@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import '../core/theme/app_theme.dart';
 import '../models/daily_gitsawe.dart';
 import '../models/verse.dart';
+import '../models/audio.dart';
+import '../services/audio_library_service.dart';
+import '../services/gitsawe_service.dart';
+import 'audio_play_button.dart';
+import 'sinksar_section.dart';
 
 const Map<String, String> _partLabels = {
   'msbak': 'ምስባክ',
@@ -24,6 +29,7 @@ class ManuscriptCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.cream,
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.black.withOpacity(0.05)),
       ),
       child: child,
     );
@@ -46,6 +52,7 @@ class ReadingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final ref = _formatReference(reading.verse);
     final t = reading.text;
+    final audioTrack = AudioLibraryService.instance.findReadingTrack(reading.verse.bookTitle, reading.verse.chapter);
 
     return ManuscriptCard(
       child: Column(
@@ -66,6 +73,11 @@ class ReadingCard extends StatelessWidget {
                   )
                 else
                   const Spacer(),
+                if (audioTrack != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: AudioPlayButton(tracks: [audioTrack], label: 'አድምጥ'),
+                  ),
                 if (ref.isNotEmpty)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -114,15 +126,18 @@ class _TaggedText extends StatelessWidget {
           ),
           TextSpan(
             text: text,
-            style: TextStyle(fontSize: 15, height: 1.7, fontStyle: italic ? FontStyle.italic : FontStyle.normal, color: muted ? Colors.black54 : Colors.black87),
+            style: TextStyle(
+              fontSize: 15, 
+              height: 1.7, 
+              fontStyle: italic ? FontStyle.italic : FontStyle.normal, 
+              color: muted ? Colors.black54 : Colors.black87,
+            ),
           ),
         ],
       ),
     );
   }
 }
-
-const List<String> _partOrder = ['msbak', 'firstDeacon', 'secondDeacon', 'secondKahn', 'wengel'];
 
 class SectionBlock extends StatelessWidget {
   final String title;
@@ -133,8 +148,9 @@ class SectionBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = section;
-    if (s == null) return const SizedBox.shrink();
+    if (s == null || s.isEmpty) return const SizedBox.shrink();
 
+    final List<String> partOrder = ['msbak', 'firstDeacon', 'secondDeacon', 'secondKahn', 'wengel'];
     final byKey = {
       'msbak': s.msbak,
       'firstDeacon': s.firstDeacon,
@@ -144,7 +160,7 @@ class SectionBlock extends StatelessWidget {
     };
 
     final cards = <Widget>[];
-    for (final key in _partOrder) {
+    for (final key in partOrder) {
       final readings = byKey[key] ?? const <Verse>[];
       for (var i = 0; i < readings.length; i++) {
         final label = '${_partLabels[key]}${readings.length > 1 ? ' ${i + 1}' : ''}';
@@ -155,7 +171,21 @@ class SectionBlock extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        Row(
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: AppColors.maroon,
+                fontFamily: 'NotoSansEthiopic',
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: Divider(color: AppColors.maroon.withOpacity(0.2))),
+          ],
+        ),
         const SizedBox(height: 16),
         for (final c in cards) ...[c, const SizedBox(height: 14)],
         if (s.kidassie.isNotEmpty)
@@ -176,22 +206,46 @@ class SectionBlock extends StatelessWidget {
                   runSpacing: 8,
                   children: [
                     for (final k in s.kidassie)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: AppColors.maroon.withOpacity(0.06),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: AppColors.maroon.withOpacity(0.2)),
-                        ),
-                        child: Text(k.text.amharic.isNotEmpty ? k.text.amharic : k.text.geez,
-                            style: const TextStyle(fontSize: 14.0)),
-                      ),
+                      _KidassieChip(k: k),
                   ],
                 ),
               ],
             ),
           ),
       ],
+    );
+  }
+}
+
+class _KidassieChip extends StatelessWidget {
+  final Verse k;
+  const _KidassieChip({required this.k});
+
+  @override
+  Widget build(BuildContext context) {
+    final label = k.text.amharic.isNotEmpty ? k.text.amharic : k.text.geez;
+    final folder = AudioLibraryService.instance.findKidassieFolder(label);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.maroon.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.maroon.withOpacity(0.2)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 14.0)),
+          if (folder != null) ...[
+            const SizedBox(width: 8),
+            AudioPlayButton(
+              tracks: AudioLibraryService.instance.tracksOfFolder(folder.id),
+              label: '',
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
@@ -204,25 +258,69 @@ class GitsaweView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sinksarDate = entry.date.split('-');
+    final day = int.tryParse(sinksarDate[0]) ?? 0;
+    final month = int.tryParse(sinksarDate.length > 1 ? sinksarDate[1] : '0') ?? 0;
+
+    // Build queue for "Play all" button
+    final List<AudioTrack> playAllQueue = [];
+    void addToQueue(ReadingGroup group) {
+      final List<List<Verse>> allReadings = [
+        group.msbak, group.firstDeacon, group.secondDeacon, group.secondKahn, group.wengel
+      ];
+      for (final list in allReadings) {
+        for (final v in list) {
+          final track = AudioLibraryService.instance.findReadingTrack(v.verse.bookTitle, v.verse.chapter);
+          if (track != null) playAllQueue.add(track);
+        }
+      }
+    }
+    addToQueue(entry.negh);
+    addToQueue(entry.kidassie);
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        _StatsHeader(),
+        const SizedBox(height: 24),
         ManuscriptCard(
-          padding: const EdgeInsets.all(22),
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               if (dateLabel != null && dateLabel!.isNotEmpty)
-                Text(dateLabel!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, color: Colors.black54, letterSpacing: 2)),
-              const SizedBox(height: 8),
-              Text(entry.title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
-              if (!entry.negh.isEmpty) const SizedBox(height: 12),
+                Text(
+                  dateLabel!, 
+                  textAlign: TextAlign.center, 
+                  style: const TextStyle(fontSize: 12, color: Colors.black54, letterSpacing: 2),
+                ),
+              const SizedBox(height: 12),
+              Text(
+                entry.title, 
+                textAlign: TextAlign.center, 
+                style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: AppColors.maroon, height: 1.4),
+              ),
+              const SizedBox(height: 24),
+              if (playAllQueue.isNotEmpty)
+                AudioPlayButton(
+                  tracks: playAllQueue,
+                  label: 'ንባባቱን በተራ አድምጥ (${playAllQueue.length})',
+                ),
             ],
           ),
         ),
         if (entry.snksar.isNotEmpty) ...[
-          const SizedBox(height: 36),
-          const Text('ስንክሳር', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          const SizedBox(height: 40),
+          Row(
+            children: [
+              const Text(
+                'ስንክሳር',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.maroon, fontFamily: 'NotoSansEthiopic'),
+              ),
+              const SizedBox(width: 12),
+              Expanded(child: Divider(color: AppColors.maroon.withOpacity(0.2))),
+            ],
+          ),
           const SizedBox(height: 16),
           ManuscriptCard(
             child: Column(
@@ -230,16 +328,21 @@ class GitsaweView extends StatelessWidget {
               children: [
                 for (var i = 0; i < entry.snksar.length; i++)
                   Padding(
-                    padding: EdgeInsets.only(bottom: i == entry.snksar.length - 1 ? 0 : 12),
+                    padding: EdgeInsets.only(bottom: i == entry.snksar.length - 1 ? 0 : 16),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 3),
-                          child: Text('${i + 1}.', style: const TextStyle(fontSize: 13, color: AppColors.maroon, fontWeight: FontWeight.w600)),
+                        Text(
+                          '${i + 1}.', 
+                          style: const TextStyle(fontSize: 14, color: AppColors.gold, fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(child: Text(entry.snksar[i].amharic, style: const TextStyle(fontSize: 14.5, height: 1.7))),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            entry.snksar[i].amharic, 
+                            style: const TextStyle(fontSize: 15, height: 1.7, color: Colors.black87),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -248,14 +351,72 @@ class GitsaweView extends StatelessWidget {
           ),
         ],
         if (!entry.negh.isEmpty) ...[
-          const SizedBox(height: 36),
+          const SizedBox(height: 40),
           SectionBlock(title: 'ንባባተ ነግህ', section: entry.negh),
         ],
         if (!entry.kidassie.isEmpty) ...[
-          const SizedBox(height: 36),
+          const SizedBox(height: 40),
           SectionBlock(title: 'ንባባተ ቅዳሴ', section: entry.kidassie),
         ],
+        if (month >= 1 && month <= 13) ...[
+          const SizedBox(height: 40),
+          SinksarSection(day: day, month: month),
+        ],
       ],
+    );
+  }
+}
+
+class _StatsHeader extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final service = GitsaweService.instance;
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          _StatCard(count: service.allDaily.length, label: 'የዕለት ግጻዌ'),
+          _StatCard(count: service.monthlyGitsawe.length, label: 'የወር ግጻዌ'),
+          _StatCard(count: service.seasonalGitsawe.length, label: 'የዘመን ግጻዌ'),
+          _StatCard(count: service.feastsForMonth('').length, label: 'በዓላት'), // Note: empty month matches all if not loaded? Service filters.
+          _StatCard(count: service.mahlets.length, label: 'ማኅሌት'),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final int count;
+  final String label;
+
+  const _StatCard({required this.count, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 120,
+      margin: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.black.withOpacity(0.05)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            count.toString(),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.maroon),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 11, color: Colors.black54),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }

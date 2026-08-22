@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import '../widgets/gitsawe_app_bar.dart';
 import '../widgets/app_sidebar.dart';
 
+import '../widgets/screen_wrapper.dart';
+
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const GitsaweAppBar(title: 'Settings'),
-      drawer: const AppSidebar(currentIndex: -1),
+    return ScreenWrapper(
+      currentIndex: -1,
+      title: 'Settings',
       body: ListView(
         children: [
           const _SettingsSection(
