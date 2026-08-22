@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/gitsawe_service.dart';
 import '../core/theme/app_theme.dart';
-import '../widgets/gitsawe_app_bar.dart';
-import '../widgets/app_sidebar.dart';
 import 'calendar_detail_screen.dart';
 
 import '../widgets/screen_wrapper.dart';

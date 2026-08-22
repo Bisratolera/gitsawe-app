@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widgets/gitsawe_app_bar.dart';
-import '../widgets/app_sidebar.dart';
 
 import '../widgets/screen_wrapper.dart';
 

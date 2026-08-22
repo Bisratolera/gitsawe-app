@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import '../core/navigation/main_tabs.dart';
-import '../widgets/gitsawe_app_bar.dart';
-import '../widgets/app_sidebar.dart';
-import '../widgets/app_bottom_nav.dart';
 import 'bookmarks_screen.dart';
 import 'settings_screen.dart';
 import 'about_screen.dart';

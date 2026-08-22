@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/daily_gitsawe.dart';
 import '../widgets/gitsawe_view.dart';
-import '../core/theme/app_theme.dart';
 import '../widgets/screen_wrapper.dart';
 
 class CalendarDetailScreen extends StatelessWidget {

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../models/daily_gitsawe.dart';
 import '../services/gitsawe_service.dart';
 import '../widgets/gitsawe_app_bar.dart';
-import '../widgets/app_sidebar.dart';
 import '../widgets/gitsawe_view.dart';
 
 import '../widgets/screen_wrapper.dart';
