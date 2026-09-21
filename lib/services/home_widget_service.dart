@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 
 import '../models/daily_gitsawe.dart';
+import 'gitsawe_service.dart';
 
 /// Pushes today's Gitsawe reading to the native home screen widget
 /// (Android AppWidget / iOS WidgetKit) via the `home_widget` plugin.
@@ -18,6 +21,8 @@ class HomeWidgetService {
 
   /// Must match the class name of GitsaweWidgetProvider.kt.
   static const String _androidWidgetName = 'GitsaweWidgetProvider';
+  static const String _qualifiedAndroidWidgetName =
+      'com.example.gitsawe.GitsaweWidgetProvider';
 
   /// Must match the `kind:` string used in the iOS WidgetKit extension.
   static const String _iOSWidgetKind = 'GitsaweWidget';
@@ -27,7 +32,37 @@ class HomeWidgetService {
   static const String keyDate = 'gitsawe_date';
   static const String keyTitle = 'gitsawe_title';
   static const String keySnksar = 'gitsawe_snksar';
+  static const String keyDailyCache = 'gitsawe_daily_cache';
   static const String keyUpdatedAt = 'gitsawe_updated_at';
+
+  Future<bool> requestPinWidget() async {
+    try {
+      final supported = await HomeWidget.isRequestPinWidgetSupported() ?? false;
+      if (!supported) return false;
+
+      await HomeWidget.requestPinWidget(
+        qualifiedAndroidName: _qualifiedAndroidWidgetName,
+      );
+      return true;
+    } catch (e, st) {
+      debugPrint('HomeWidgetService.requestPinWidget failed: $e\n$st');
+      return false;
+    }
+  }
+
+  static String buildDailyCacheJson(List<DailyGitsawe> entries) {
+    final payload = entries.map((entry) {
+      return {
+        'date': entry.date,
+        'title': entry.title,
+        'snksar': entry.snksar
+            .map((s) => {'amharic': s.amharic})
+            .toList(growable: false),
+      };
+    }).toList(growable: false);
+
+    return jsonEncode(payload);
+  }
 
   /// Writes today's reading into widget storage and asks the OS to redraw
   /// any placed widgets. Safe to call often — it's cheap and never throws
@@ -42,11 +77,13 @@ class HomeWidgetService {
       final snksar = (reading != null && reading.snksar.isNotEmpty)
           ? reading.snksar.first.amharic
           : 'ለዛሬ ስንክሳር የለም';
+      final cacheJson = buildDailyCacheJson(GitsaweService.instance.allDaily);
 
       await Future.wait([
         HomeWidget.saveWidgetData<String>(keyDate, ethiopianDateLabel),
         HomeWidget.saveWidgetData<String>(keyTitle, title),
         HomeWidget.saveWidgetData<String>(keySnksar, snksar),
+        HomeWidget.saveWidgetData<String>(keyDailyCache, cacheJson),
         HomeWidget.saveWidgetData<String>(
           keyUpdatedAt,
           DateTime.now().toIso8601String(),

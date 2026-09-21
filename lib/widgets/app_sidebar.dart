@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:gitsawe/screen/audio_library_screen.dart';
 import '../core/theme/app_theme.dart';
 import '../screen/today_screen.dart';
+import '../screen/daily_gitsawe_screen.dart';
+import '../screen/teachings_screen.dart';
 import '../screen/calendar_screen.dart';
 import '../screen/mahlet_screen.dart';
 import '../screen/search_screen.dart';
@@ -80,24 +82,44 @@ class AppSidebar extends StatelessWidget {
                 ),
                 _buildNavItem(
                   context,
+                  icon: Icons.calendar_view_day_outlined,
+                  label: 'Daily',
+                  index: 1,
+                  destination: const DailyGitsaweScreen(),
+                ),
+                _buildNavItem(
+                  context,
+                  icon: Icons.menu_book_rounded,
+                  label: 'ትምህርቶች',
+                  index: 2,
+                  destination: const TeachingsScreen(),
+                ),
+                _buildNavItem(
+                  context,
                   icon: Icons.calendar_month_outlined,
                   label: 'የወር',
-                  index: 1,
+                  index: 3,
                   destination: const CalendarScreen(),
                 ),
                 _buildNavItem(
                   context,
                   icon: Icons.music_note_outlined,
                   label: 'ማኅሌት',
-                  index: 2,
+                  index: 4,
                   destination: const MahletScreen(),
                 ),
                 _buildNavItem(
                   context,
                   icon: Icons.search_outlined,
                   label: 'ፍለጋ',
-                  index: 3,
+                  index: 5,
                   destination: const SearchScreen(),
+                ),
+                _buildNavItem(
+                  context,
+                  icon: Icons.library_music_outlined,
+                  label: 'Audio Library',
+                  destination: const AudioLibraryScreen(),
                 ),
                 const Divider(),
                 _buildNavItem(
@@ -124,12 +146,7 @@ class AppSidebar extends StatelessWidget {
                   label: 'More',
                   destination: const MoreScreen(),
                 ),
-                _buildNavItem(
-                  context,
-                  icon: Icons.library_music_outlined,
-                  label: 'Audio Library',
-                  destination: const AudioLibraryScreen(),
-                )
+
               ],
             ),
           ),
@@ -152,17 +169,18 @@ class AppSidebar extends StatelessWidget {
     int? index,
     required Widget destination,
   }) {
+    final colors = Theme.of(context).colorScheme;
     final isSelected = index != null && currentIndex == index;
 
     return ListTile(
       leading: Icon(
         icon,
-        color: isSelected ? AppColors.maroon : Colors.grey[700],
+        color: isSelected ? colors.primary : colors.onSurfaceVariant,
       ),
       title: Text(
         label,
         style: TextStyle(
-          color: isSelected ? AppColors.maroon : Colors.black87,
+          color: isSelected ? colors.primary : colors.onSurface,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
       ),

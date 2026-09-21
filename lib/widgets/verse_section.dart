@@ -10,6 +10,7 @@ class VerseSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     if (verses.isEmpty) return const SizedBox.shrink();
 
     return Padding(
@@ -17,8 +18,8 @@ class VerseSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(headerLabel,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            Text(headerLabel,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: colors.primary)),
           const SizedBox(height: 6),
           ...verses.map((v) => _VerseTile(verse: v)),
         ],
@@ -41,12 +42,13 @@ class _VerseTileState extends State<_VerseTile> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final v = widget.verse;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.cream,
+        color: colors.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -57,20 +59,20 @@ class _VerseTileState extends State<_VerseTile> {
             alignment: Alignment.centerRight,
             child: Text(
               '${v.verse.bookTitle} ${v.verse.display}',
-              style: const TextStyle(
-                  fontStyle: FontStyle.italic, fontSize: 12, color: Colors.grey),
+                style: TextStyle(
+                  fontStyle: FontStyle.italic, fontSize: 12, color: colors.onSurfaceVariant),
             ),
           ),
           const SizedBox(height: 6),
           Text(
             _showGeez ? v.text.geez : v.text.amharic,
-            style: const TextStyle(fontSize: 16, height: 1.4, color: Colors.black87),
+            style: TextStyle(fontSize: 16, height: 1.4, color: colors.onSurface),
           ),
           if (_showEnglish && v.text.english.isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(v.text.english,
-                style: const TextStyle(
-                    fontSize: 15, fontStyle: FontStyle.italic, color: Colors.black87)),
+                style: TextStyle(
+                  fontSize: 15, fontStyle: FontStyle.italic, color: colors.onSurface)),
           ],
           const SizedBox(height: 8),
           Wrap(

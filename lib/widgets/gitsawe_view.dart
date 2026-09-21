@@ -5,6 +5,8 @@ import '../models/verse.dart';
 import '../models/audio.dart';
 import '../services/audio_library_service.dart';
 import '../services/gitsawe_service.dart';
+import '../services/bookmark_service.dart';
+import '../services/share_service.dart';
 import 'audio_play_button.dart';
 import 'sinksar_section.dart';
 
@@ -24,12 +26,13 @@ class ManuscriptCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Container(
       padding: padding ?? const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.cream,
+        color: colors.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black.withOpacity(0.05)),
+        border: Border.all(color: colors.outlineVariant.withOpacity(0.45)),
       ),
       child: child,
     );
@@ -50,6 +53,7 @@ class ReadingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final ref = _formatReference(reading.verse);
     final t = reading.text;
     final audioTrack = AudioLibraryService.instance.findReadingTrack(reading.verse.bookTitle, reading.verse.chapter);
@@ -60,16 +64,16 @@ class ReadingCard extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.only(bottom: 10),
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: Colors.black12)),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: colors.outlineVariant)),
             ),
             child: Row(
               children: [
                 if (label != null)
                   Expanded(
                     child: Text(label!,
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.maroon)),
+                        style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600, color: colors.primary)),
                   )
                 else
                   const Spacer(),
@@ -85,7 +89,7 @@ class ReadingCard extends StatelessWidget {
                       color: AppColors.maroon.withOpacity(0.08),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(ref, style: const TextStyle(fontSize: 12, color: AppColors.maroon)),
+                    child: Text(ref, style: TextStyle(fontSize: 12, color: colors.primary)),
                   ),
               ],
             ),
@@ -116,13 +120,14 @@ class _TaggedText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return RichText(
       text: TextSpan(
-        style: const TextStyle(fontFamily: 'NotoSansEthiopic'),
+        style: TextStyle(fontFamily: 'NotoSansEthiopic', color: colors.onSurface),
         children: [
           TextSpan(
             text: '$tag  ',
-            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.maroon),
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: colors.primary),
           ),
           TextSpan(
             text: text,
@@ -130,7 +135,7 @@ class _TaggedText extends StatelessWidget {
               fontSize: 15, 
               height: 1.7, 
               fontStyle: italic ? FontStyle.italic : FontStyle.normal, 
-              color: muted ? Colors.black54 : Colors.black87,
+              color: muted ? colors.onSurfaceVariant : colors.onSurface,
             ),
           ),
         ],
@@ -147,6 +152,7 @@ class SectionBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final s = section;
     if (s == null || s.isEmpty) return const SizedBox.shrink();
 
@@ -175,10 +181,10 @@ class SectionBlock extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: AppColors.maroon,
+                color: colors.primary,
                 fontFamily: 'NotoSansEthiopic',
               ),
             ),
@@ -195,10 +201,10 @@ class SectionBlock extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.only(bottom: 10),
-                  decoration: const BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.black12)),
+                    decoration: BoxDecoration(
+                    border: Border(bottom: BorderSide(color: colors.outlineVariant)),
                   ),
-                  child: const Text('ቅዳሴ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.maroon)),
+                  child: Text('ቅዳሴ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: colors.primary)),
                 ),
                 const SizedBox(height: 12),
                 Wrap(
@@ -223,6 +229,7 @@ class _KidassieChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final label = k.text.amharic.isNotEmpty ? k.text.amharic : k.text.geez;
     final folder = AudioLibraryService.instance.findKidassieFolder(label);
 
@@ -236,7 +243,7 @@ class _KidassieChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: const TextStyle(fontSize: 14.0)),
+          Text(label, style: TextStyle(fontSize: 14.0, color: colors.onSurface)),
           if (folder != null) ...[
             const SizedBox(width: 8),
             AudioPlayButton(
@@ -256,8 +263,18 @@ class GitsaweView extends StatelessWidget {
 
   const GitsaweView({super.key, required this.entry, this.dateLabel});
 
+  Future<void> _share(BuildContext context) async {
+    final text = [
+      entry.title,
+      if (dateLabel != null && dateLabel!.isNotEmpty) dateLabel!,
+      ...entry.snksar.take(3).map((item) => item.amharic),
+    ].join('\n');
+    await ShareService.shareText(context, text);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final sinksarDate = entry.date.split('-');
     final day = int.tryParse(sinksarDate[0]) ?? 0;
     final month = int.tryParse(sinksarDate.length > 1 ? sinksarDate[1] : '0') ?? 0;
@@ -292,13 +309,38 @@ class GitsaweView extends StatelessWidget {
                 Text(
                   dateLabel!, 
                   textAlign: TextAlign.center, 
-                  style: const TextStyle(fontSize: 12, color: Colors.black54, letterSpacing: 2),
+                  style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant, letterSpacing: 2),
                 ),
               const SizedBox(height: 12),
               Text(
                 entry.title, 
                 textAlign: TextAlign.center, 
-                style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: AppColors.maroon, height: 1.4),
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: colors.primary, height: 1.4),
+              ),
+              ListenableBuilder(
+                listenable: BookmarkService.instance,
+                builder: (context, child) {
+                  final bookmarked = BookmarkService.instance.contains(entry.date, entry.title);
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        tooltip: bookmarked ? 'Remove bookmark' : 'Bookmark reading',
+                        icon: Icon(bookmarked ? Icons.bookmark : Icons.bookmark_border),
+                        color: colors.primary,
+                        onPressed: () => BookmarkService.instance.toggle(
+                          Bookmark(date: entry.date, title: entry.title),
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Share reading',
+                        icon: const Icon(Icons.share_outlined),
+                        color: colors.primary,
+                        onPressed: () => _share(context),
+                      ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 24),
               if (playAllQueue.isNotEmpty)
@@ -313,9 +355,9 @@ class GitsaweView extends StatelessWidget {
           const SizedBox(height: 40),
           Row(
             children: [
-              const Text(
+              Text(
                 'ስንክሳር',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.maroon, fontFamily: 'NotoSansEthiopic'),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: colors.primary, fontFamily: 'NotoSansEthiopic'),
               ),
               const SizedBox(width: 12),
               Expanded(child: Divider(color: AppColors.maroon.withOpacity(0.2))),
@@ -340,7 +382,7 @@ class GitsaweView extends StatelessWidget {
                         Expanded(
                           child: Text(
                             entry.snksar[i].amharic, 
-                            style: const TextStyle(fontSize: 15, height: 1.7, color: Colors.black87),
+                            style: TextStyle(fontSize: 15, height: 1.7, color: colors.onSurface),
                           ),
                         ),
                       ],
@@ -394,25 +436,26 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Container(
       width: 120,
       margin: const EdgeInsets.only(right: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black.withOpacity(0.05)),
+        border: Border.all(color: colors.outlineVariant.withOpacity(0.45)),
       ),
       child: Column(
         children: [
           Text(
             count.toString(),
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.maroon),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: colors.primary),
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: const TextStyle(fontSize: 11, color: Colors.black54),
+            style: TextStyle(fontSize: 11, color: colors.onSurfaceVariant),
             textAlign: TextAlign.center,
           ),
         ],

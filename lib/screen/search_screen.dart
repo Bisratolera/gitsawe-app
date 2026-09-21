@@ -12,7 +12,7 @@ class SearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const ScreenWrapper(
-      currentIndex: 3,
+      currentIndex: 5,
       title: 'ፍለጋ',
       body: _SearchBody(),
     );
@@ -31,6 +31,7 @@ class _SearchBodyState extends State<_SearchBody> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final all = GitsaweService.instance.allDaily;
     final results = _query.isEmpty
         ? [] // Don't show everything initially
@@ -51,7 +52,7 @@ class _SearchBodyState extends State<_SearchBody> {
                 borderRadius: BorderRadius.circular(10),
               ),
               filled: true,
-              fillColor: Colors.grey[100],
+              fillColor: colors.surfaceContainerHighest,
             ),
             onChanged: (v) => setState(() => _query = v),
           ),

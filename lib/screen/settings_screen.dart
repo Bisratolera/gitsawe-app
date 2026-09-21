@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../services/app_settings.dart';
 import '../widgets/screen_wrapper.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -7,60 +8,93 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenWrapper(
-      currentIndex: -1,
-      title: 'Settings',
-      body: ListView(
-        children: [
-          const _SettingsSection(
-            title: 'General',
+    return ListenableBuilder(
+      listenable: AppSettings.instance,
+      builder: (context, child) {
+        return ScreenWrapper(
+          currentIndex: -1,
+          title: 'Settings',
+          body: ListView(
             children: [
-              ListTile(
-                leading: Icon(Icons.language),
-                title: Text('Language'),
-                subtitle: Text('Default (Amharic)'),
-                trailing: Icon(Icons.chevron_right),
+              const _SettingsSection(
+                title: 'General',
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.language),
+                    title: Text('Language'),
+                    subtitle: Text('Default (Amharic)'),
+                    trailing: Icon(Icons.chevron_right),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.notifications),
+                    title: Text('Notifications'),
+                    trailing: Switch(value: true, onChanged: null),
+                  ),
+                ],
               ),
-              ListTile(
-                leading: Icon(Icons.notifications),
-                title: Text('Notifications'),
-                trailing: Switch(value: true, onChanged: null),
+              _SettingsSection(
+                title: 'Appearance',
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.text_format),
+                    title: const Text('Font Size'),
+                    subtitle: Text(_fontSizeLabel(AppSettings.instance.textScale)),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          tooltip: 'Decrease text size',
+                          onPressed: () => AppSettings.instance.setTextScale(
+                            AppSettings.instance.textScale - 0.1,
+                          ),
+                          icon: const Icon(Icons.remove),
+                        ),
+                        IconButton(
+                          tooltip: 'Increase text size',
+                          onPressed: () => AppSettings.instance.setTextScale(
+                            AppSettings.instance.textScale + 0.1,
+                          ),
+                          icon: const Icon(Icons.add),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.dark_mode),
+                    title: const Text('Dark Mode'),
+                    trailing: Switch(
+                      value: AppSettings.instance.isDarkMode,
+                      onChanged: AppSettings.instance.setDarkMode,
+                    ),
+                  ),
+                ],
+              ),
+              _SettingsSection(
+                title: 'Storage',
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.delete_outline),
+                    title: const Text('Clear Cache'),
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Cache cleared')),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
-          const _SettingsSection(
-            title: 'Appearance',
-            children: [
-              ListTile(
-                leading: Icon(Icons.text_format),
-                title: Text('Font Size'),
-                subtitle: Text('Medium'),
-                trailing: Icon(Icons.chevron_right),
-              ),
-              ListTile(
-                leading: Icon(Icons.dark_mode),
-                title: Text('Dark Mode'),
-                trailing: Switch(value: false, onChanged: null),
-              ),
-            ],
-          ),
-          _SettingsSection(
-            title: 'Storage',
-            children: [
-              ListTile(
-                leading: const Icon(Icons.delete_outline),
-                title: const Text('Clear Cache'),
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Cache cleared')),
-                  );
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
+        );
+      },
     );
+  }
+
+  static String _fontSizeLabel(double scale) {
+    if (scale < 0.95) return 'Small';
+    if (scale > 1.15) return 'Large';
+    if (scale > 1.05) return 'Medium large';
+    return 'Medium';
   }
 }
 

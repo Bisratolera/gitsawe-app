@@ -21,7 +21,7 @@ class CalendarDetailScreen extends StatelessWidget {
     }
 
     return ScreenWrapper(
-      currentIndex: 1, // Calendar tab
+      currentIndex: 3, // Calendar tab
       title: title,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

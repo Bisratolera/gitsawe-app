@@ -11,6 +11,51 @@ class AudioLibraryService {
   Map<String, String> _bookMap = {};
   Map<String, String> _kidassieMap = {};
 
+  AudioFolder? _resolveBookFolder(String label) {
+    if (_bookMap.isEmpty) return null;
+
+    final normalizedLabel = normalizeBook(label);
+    for (final entry in _bookMap.entries) {
+      final key = normalizeBook(entry.key);
+      if (key == normalizedLabel ||
+          key.contains(normalizedLabel) ||
+          normalizedLabel.contains(key)) {
+        return library.folderById[entry.value];
+      }
+    }
+    return null;
+  }
+
+  AudioFolder? _resolveKidassieFolder(String label) {
+    if (_kidassieMap.isEmpty) return null;
+
+    final candidates = <String>{
+      label,
+      normalizeKidassieLabel(label),
+      normalizeBook(label),
+      label.replaceAll(RegExp(r'\s+'), ''),
+      label.replaceAll('ዘ', '').trim(),
+    };
+
+    for (final candidate in candidates) {
+      final direct = _kidassieMap[candidate];
+      if (direct != null && library.folderById.containsKey(direct)) {
+        return library.folderById[direct];
+      }
+    }
+
+    final normalizedLabel = normalizeKidassieLabel(label);
+    for (final entry in _kidassieMap.entries) {
+      final key = normalizeKidassieLabel(entry.key);
+      if (key == normalizedLabel ||
+          key.contains(normalizedLabel) ||
+          normalizedLabel.contains(key)) {
+        return library.folderById[entry.value];
+      }
+    }
+    return null;
+  }
+
   bool get isLoaded => _library != null;
   AudioLibrary get library {
     final lib = _library;
@@ -140,6 +185,16 @@ class AudioLibraryService {
   String normalizeBook(String s) =>
       s.replaceAll(RegExp(r'\s+'), "").replaceAll("ኛ", "").replaceAll("መልዕክት", "መልእክት");
 
+  String normalizeKidassieLabel(String s) {
+    var value = s.trim();
+    value = value.replaceAll(RegExp(r'\s+'), ' ');
+    value = value.replaceAll('ዘ', '');
+    value = value.replaceAll('፣', '');
+    value = value.replaceAll('፤', '');
+    value = value.replaceAll(RegExp(r'[^\u1200-\u137F\u2D80-\u2DDFa-zA-Z0-9 ]'), '');
+    return value.replaceAll(RegExp(r'\s+'), '').toLowerCase();
+  }
+
   /// Tries to find the best-match audio track for a reading.
   AudioTrack? findReadingTrack(String? bookTitle, dynamic chapter) {
     if (bookTitle == null || !isLoaded) return null;
@@ -172,6 +227,17 @@ class AudioLibraryService {
 
   AudioFolder? findKidassieFolder(String label) {
     if (!isLoaded) return null;
-    return library.folders.where((f) => f.title.contains(label)).firstOrNull;
+
+    final resolved = _resolveKidassieFolder(label);
+    if (resolved != null) return resolved;
+
+    final normalizedLabel = normalizeKidassieLabel(label);
+    return library.folders.where((f) {
+      final title = normalizeKidassieLabel(f.title);
+      return title.contains(normalizedLabel) ||
+          normalizedLabel.contains(title) ||
+          title == normalizedLabel ||
+          normalizeBook(f.title).contains(normalizeBook(label));
+    }).firstOrNull;
   }
 }

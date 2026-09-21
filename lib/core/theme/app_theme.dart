@@ -57,4 +57,45 @@ class AppTheme {
       fontFamily: 'NotoSansEthiopic',
     );
   }
+
+  static ThemeData get darkTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: const Color(0xFF171114),
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: AppColors.maroon,
+        brightness: Brightness.dark,
+        primary: AppColors.gold,
+        secondary: AppColors.gold,
+        surface: const Color(0xFF241B1E),
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF241B1E),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        color: const Color(0xFF2D2226),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+      ),
+      textTheme: const TextTheme(
+        bodyLarge: TextStyle(color: Colors.white, fontFamily: 'NotoSansEthiopic'),
+        bodyMedium: TextStyle(color: Colors.white, fontFamily: 'NotoSansEthiopic'),
+        bodySmall: TextStyle(color: Color(0xFFCEC4C7), fontFamily: 'NotoSansEthiopic'),
+        titleLarge: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'NotoSansEthiopic',
+        ),
+      ),
+      dividerTheme: const DividerThemeData(
+        thickness: 1,
+        color: Color(0xFF514348),
+      ),
+      fontFamily: 'NotoSansEthiopic',
+    );
+  }
 }

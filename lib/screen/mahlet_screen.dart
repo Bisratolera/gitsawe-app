@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/gitsawe_service.dart';
 import '../models/mahlet.dart';
-import '../core/theme/app_theme.dart';
 import '../widgets/gitsawe_app_bar.dart';
 
 import '../widgets/screen_wrapper.dart';
@@ -11,10 +10,11 @@ class MahletScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final List<Mahlet> mahlets = GitsaweService.instance.mahlets;
 
     return ScreenWrapper(
-      currentIndex: 2,
+      currentIndex: 4,
       title: 'ሥርዓተ ማኅሌት',
       body: mahlets.isEmpty
           ? const Center(
@@ -42,12 +42,12 @@ class MahletScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colors.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.black12),
+                        border: Border.all(color: colors.outlineVariant.withOpacity(0.45)),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.02),
+                            color: colors.shadow.withOpacity(0.15),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -62,21 +62,21 @@ class MahletScreen extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   mahlet.title,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: AppColors.maroon,
+                                    color: colors.primary,
                                   ),
                                 ),
                               ),
-                              const Icon(Icons.chevron_right, color: Colors.black26),
+                              Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
                             ],
                           ),
                           if (mahlet.source != null && mahlet.source!.isNotEmpty) ...[
                             const SizedBox(height: 6),
                             Text(
                               'ምንጭ፦ ${mahlet.source}',
-                              style: const TextStyle(fontSize: 12, color: Colors.black54),
+                              style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
                             ),
                           ],
                         ],
@@ -97,6 +97,7 @@ class _MahletDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: GitsaweAppBar(title: mahlet.title),
       body: SingleChildScrollView(
@@ -109,7 +110,7 @@ class _MahletDetailScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: Text(
                   'ምንጭ፦ ${mahlet.source}',
-                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                  style: TextStyle(fontSize: 14, color: colors.onSurfaceVariant),
                 ),
               ),
             ...mahlet.details.map((detail) {
@@ -120,10 +121,10 @@ class _MahletDetailScreen extends StatelessWidget {
                   children: [
                     Text(
                       detail.key,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.maroon,
+                        color: colors.primary,
                         letterSpacing: 1.2,
                       ),
                     ),

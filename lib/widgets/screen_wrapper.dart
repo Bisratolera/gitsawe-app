@@ -29,7 +29,7 @@ class ScreenWrapper extends StatelessWidget {
     if (useContainer) {
       mainContent = Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           boxShadow: [
             BoxShadow(
@@ -47,7 +47,7 @@ class ScreenWrapper extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.cream,
+      backgroundColor: AppColors.maroon,
       appBar: showHeader ? GitsaweAppBar(title: title) : null,
       drawer: AppSidebar(currentIndex: currentIndex),
       body: mainContent,
@@ -55,10 +55,11 @@ class ScreenWrapper extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const MiniPlayerBar(),
-          AppBottomNav(
-            currentIndex: currentIndex,
-            onTap: (i) => goToMainTab(context, i),
-          ),
+          if (currentIndex >= 0)
+            AppBottomNav(
+              currentIndex: currentIndex,
+              onTap: (i) => goToMainTab(context, i),
+            ),
         ],
       ),
     );

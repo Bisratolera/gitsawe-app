@@ -10,12 +10,16 @@ import 'services/home_widget_service.dart';
 import 'services/notification_service.dart';
 import 'services/audio_library_service.dart';
 import 'services/sinksar_service.dart';
+import 'services/app_settings.dart';
+import 'services/bookmark_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final prefs = await SharedPreferences.getInstance();
   final bool onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
+  await AppSettings.instance.load();
+  await BookmarkService.instance.load();
 
   // Load Gitsawe data from the API before the app starts. If this fails
   // (e.g. offline at launch), TodayScreen retries once it's mounted.
@@ -60,11 +64,27 @@ class GitsaweApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Gitsawe',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.theme,
-      home: onboardingCompleted ? const TodayScreen() : const OnboardingScreen(),
+    return ListenableBuilder(
+      listenable: AppSettings.instance,
+      builder: (context, child) {
+        return MaterialApp(
+          title: 'Gitsawe',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.theme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: AppSettings.instance.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          builder: (context, child) {
+            final mediaQuery = MediaQuery.of(context);
+            return MediaQuery(
+              data: mediaQuery.copyWith(
+                textScaler: TextScaler.linear(AppSettings.instance.textScale),
+              ),
+              child: child!,
+            );
+          },
+          home: onboardingCompleted ? const TodayScreen() : const OnboardingScreen(),
+        );
+      },
     );
   }
 }

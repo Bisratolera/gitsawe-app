@@ -49,6 +49,7 @@ class _SinksarSectionState extends State<SinksarSection> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     if (!_isLoading && (_entries == null || _entries!.isEmpty)) {
       return const SizedBox.shrink();
     }
@@ -61,21 +62,21 @@ class _SinksarSectionState extends State<SinksarSection> {
       children: [
         Row(
           children: [
-            const Text(
+            Text(
               'ስንክሳር ንባብ',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: AppColors.maroon,
+                color: colors.primary,
                 fontFamily: 'NotoSansEthiopic',
               ),
             ),
             const Spacer(),
             Text(
               dateLabel,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
-                color: Colors.black54,
+                color: colors.onSurfaceVariant,
               ),
             ),
           ],
@@ -92,9 +93,9 @@ class _SinksarSectionState extends State<SinksarSection> {
               margin: const EdgeInsets.only(bottom: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: Colors.black.withOpacity(0.05)),
+                side: BorderSide(color: colors.outlineVariant.withOpacity(0.45)),
               ),
-              color: Colors.white,
+              color: colors.surfaceContainerHighest,
               child: Column(
                 children: [
                   InkWell(
@@ -121,10 +122,10 @@ class _SinksarSectionState extends State<SinksarSection> {
                           Expanded(
                             child: Text(
                               entry.title,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.maroon,
+                                color: colors.primary,
                                 fontFamily: 'NotoSansEthiopic',
                               ),
                             ),
@@ -132,7 +133,7 @@ class _SinksarSectionState extends State<SinksarSection> {
                           Icon(
                             isOpen ? Icons.remove : Icons.add,
                             size: 20,
-                            color: Colors.black38,
+                            color: colors.onSurfaceVariant,
                           ),
                         ],
                       ),
@@ -150,10 +151,10 @@ class _SinksarSectionState extends State<SinksarSection> {
                                 padding: const EdgeInsets.only(bottom: 12),
                                 child: Text(
                                   p.trim(),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 15,
                                     height: 1.7,
-                                    color: Colors.black87,
+                                    color: colors.onSurface,
                                   ),
                                 ),
                               )),

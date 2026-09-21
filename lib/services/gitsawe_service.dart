@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import '../models/mahlet.dart';
 import '../models/daily_gitsawe.dart';
 import '../models/feast.dart';
@@ -29,63 +31,90 @@ class GitsaweService {
   /// Raw access to all daily entries for search or offline features.
   List<DailyGitsawe> get allDaily => _loaded ? _daily : [];
 
-  /// Loads and parses everything from the Gitsawe API. Must be awaited
-  /// before calling lookups. Safe to call repeatedly: once loaded it's a
-  /// no-op unless [forceRefresh] is set (e.g. for pull-to-refresh).
+  /// Loads and parses everything from the Gitsawe API. Falls back to local
+  /// assets if the API is unreachable.
   Future<void> load({bool forceRefresh = false}) async {
     if (_loaded && !forceRefresh) return;
 
     try {
-      final results = await Future.wait([
-        // Same shape as the old bundled dailyGitsawe.json.
-        _api.getList('/daily', query: const {'full': '1'}),
-        _api.getList('/feasts'),
-        _api.getList('/subfeasts'),
-        _api.getList('/months'),
-        _api.getList('/mahlets'),
-        _loadFullList('/monthly'),
-        _loadFullList('/seasonal'),
-      ]);
-
-      final daily = (results[0])
-          .map((e) => DailyGitsawe.fromJson(e as Map<String, dynamic>))
-          .toList();
-      final feasts = (results[1])
-          .map((e) => Feast.fromJson(e as Map<String, dynamic>))
-          .toList();
-      final subFeasts = (results[2])
-          .map((e) => SubFeast.fromJson(e as Map<String, dynamic>))
-          .toList();
-      final months = (results[3])
-          .map((e) => GitsaweMonth.fromJson(e as Map<String, dynamic>))
-          .toList();
-      final mahlets = (results[4])
-          .map<Mahlet>((e) => Mahlet.fromJson(e as Map<String, dynamic>))
-          .toList();
-      final monthly = results[5];
-      final seasonal = results[6];
-
-      // Only commit once everything decoded cleanly, so a mid-load failure
-      // never leaves the service in a half-updated state.
-      _daily = daily;
-      _feasts = feasts;
-      _subFeasts = subFeasts;
-      _months = months;
-      _mahlets = mahlets;
-      _monthlyGitsawe = monthly;
-      _seasonalGitsawe = seasonal;
-      _loaded = true;
-    } catch (e, stackTrace) {
-      debugPrint('Error loading Gitsawe data from API: $e\n$stackTrace');
-      rethrow;
+      debugPrint('GitsaweService: Attempting to load from API...');
+      await _loadFromApi();
+      debugPrint('GitsaweService: Loaded from API successfully.');
+    } catch (e) {
+      debugPrint('GitsaweService: API load failed ($e). Falling back to local assets...');
+      try {
+        await _loadFromAssets();
+        debugPrint('GitsaweService: Loaded from local assets successfully.');
+      } catch (assetError, stackTrace) {
+        debugPrint('GitsaweService: Asset fallback also failed: $assetError\n$stackTrace');
+        rethrow;
+      }
     }
   }
 
-  /// `/monthly` and `/seasonal` only return `{id, date, title}` summaries.
-  /// Fetch each entry individually (skipping the sinksar/audio enrichment,
-  /// which the calendar list doesn't need) to get the full reading content
-  /// — matching the shape the old bundled monthlyGitsawe.json/seasonalGitsawe.json had.
-  Future<List<dynamic>> _loadFullList(String path) async {
+  Future<void> _loadFromApi() async {
+    final results = await Future.wait([
+      _api.getList('/daily', query: const {'full': '1'}),
+      _api.getList('/feasts'),
+      _api.getList('/subfeasts'),
+      _api.getList('/months'),
+      _api.getList('/mahlets'),
+      _loadFullListFromApi('/monthly'),
+      _loadFullListFromApi('/seasonal'),
+    ]);
+
+    _daily = (results[0])
+        .map((e) => DailyGitsawe.fromJson(e as Map<String, dynamic>))
+        .toList();
+    _feasts = (results[1])
+        .map((e) => Feast.fromJson(e as Map<String, dynamic>))
+        .toList();
+    _subFeasts = (results[2])
+        .map((e) => SubFeast.fromJson(e as Map<String, dynamic>))
+        .toList();
+    _months = (results[3])
+        .map((e) => GitsaweMonth.fromJson(e as Map<String, dynamic>))
+        .toList();
+    _mahlets = (results[4])
+        .map<Mahlet>((e) => Mahlet.fromJson(e as Map<String, dynamic>))
+        .toList();
+    _monthlyGitsawe = results[5];
+    _seasonalGitsawe = results[6];
+    _loaded = true;
+  }
+
+  Future<void> _loadFromAssets() async {
+    final results = await Future.wait([
+      rootBundle.loadString('assets/data/dailyGitsawe.json'),
+      rootBundle.loadString('assets/data/feasts.json'),
+      rootBundle.loadString('assets/data/months.json'),
+      rootBundle.loadString('assets/data/mahlets.json'),
+      rootBundle.loadString('assets/data/subFeasts.json'),
+      rootBundle.loadString('assets/data/monthlyGitsawe.json'),
+      rootBundle.loadString('assets/data/seasonalGitsawe.json'),
+    ]);
+
+    _daily = (json.decode(results[0]) as List)
+        .map((e) => DailyGitsawe.fromJson(e as Map<String, dynamic>))
+        .toList();
+    _feasts = (json.decode(results[1]) as List)
+        .map((e) => Feast.fromJson(e as Map<String, dynamic>))
+        .toList();
+    _months = (json.decode(results[2]) as List)
+        .map((e) => GitsaweMonth.fromJson(e as Map<String, dynamic>))
+        .toList();
+    _mahlets = (json.decode(results[3]) as List)
+        .map((e) => Mahlet.fromJson(e as Map<String, dynamic>))
+        .toList();
+    _subFeasts = (json.decode(results[4]) as List)
+        .map((e) => SubFeast.fromJson(e as Map<String, dynamic>))
+        .toList();
+    _monthlyGitsawe = json.decode(results[5]) as List;
+    _seasonalGitsawe = json.decode(results[6]) as List;
+    _loaded = true;
+  }
+
+  Future<List<dynamic>> _loadFullListFromApi(String path) async {
     final summaries = await _api.getList(path);
     final full = await Future.wait(summaries.map((s) {
       final id = (s as Map)['id'];

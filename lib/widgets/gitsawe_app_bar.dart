@@ -10,12 +10,12 @@ class GitsaweAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.maroon,
       elevation: 0,
       centerTitle: true,
       leading: Builder(
         builder: (context) => IconButton(
-          icon: const Icon(Icons.menu_open_rounded, color: AppColors.maroon, size: 28),
+          icon: const Icon(Icons.menu_open_rounded, color: Colors.white, size: 28),
           onPressed: () => Scaffold.of(context).openDrawer(),
         ),
       ),
@@ -26,7 +26,7 @@ class GitsaweAppBar extends StatelessWidget implements PreferredSizeWidget {
             title,
             style: const TextStyle(
               fontSize: 18,
-              color: AppColors.maroon,
+              color: Colors.white,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
             ),
@@ -34,7 +34,7 @@ class GitsaweAppBar extends StatelessWidget implements PreferredSizeWidget {
           const SizedBox(height: 2),
           Container(
             height: 3,
-            width: 32,
+            width: 60,
             decoration: BoxDecoration(
               color: AppColors.gold,
               borderRadius: BorderRadius.circular(1.5),
@@ -46,7 +46,7 @@ class GitsaweAppBar extends StatelessWidget implements PreferredSizeWidget {
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
           child: IconButton(
-            icon: const Icon(Icons.notifications_none_outlined, color: AppColors.maroon),
+            icon: const Icon(Icons.notifications_none_outlined, color: Colors.white),
             onPressed: () {},
           ),
         ),

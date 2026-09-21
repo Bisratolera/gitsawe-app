@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/gitsawe_service.dart';
-import '../core/theme/app_theme.dart';
 import 'calendar_detail_screen.dart';
 
 import '../widgets/screen_wrapper.dart';
@@ -10,10 +9,11 @@ class CalendarScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final entries = GitsaweService.instance.monthlyGitsawe;
 
     return ScreenWrapper(
-      currentIndex: 1,
+      currentIndex: 3,
       title: 'የወር ግጻዌ',
       body: entries.isEmpty
           ? const Center(
@@ -47,12 +47,12 @@ class CalendarScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colors.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.black12),
+                        border: Border.all(color: colors.outlineVariant.withOpacity(0.45)),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.02),
+                            color: colors.shadow.withOpacity(0.15),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -66,13 +66,13 @@ class CalendarScreen extends StatelessWidget {
                             children: [
                               Text(
                                 date,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.maroon,
+                                  color: colors.primary,
                                 ),
                               ),
-                              const Icon(Icons.chevron_right, color: Colors.black26),
+                              Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
                             ],
                           ),
                           const SizedBox(height: 6),
@@ -84,7 +84,7 @@ class CalendarScreen extends StatelessWidget {
                             const SizedBox(height: 8),
                             Text(
                               'መዝሙር፦ $mezmur',
-                              style: const TextStyle(fontSize: 12, color: Colors.black54),
+                              style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
                             ),
                           ],
                         ],

@@ -3,6 +3,8 @@ import 'bookmarks_screen.dart';
 import 'settings_screen.dart';
 import 'about_screen.dart';
 
+import '../services/share_service.dart';
+import '../services/home_widget_service.dart';
 import '../widgets/screen_wrapper.dart';
 
 class MoreScreen extends StatelessWidget {
@@ -11,7 +13,7 @@ class MoreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenWrapper(
-      currentIndex: 4,
+      currentIndex: 6,
       title: 'ተጨማሪ',
       body: ListView(
         children: [
@@ -36,8 +38,27 @@ class MoreScreen extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.share),
             title: const Text('Share'),
-            onTap: () => ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text('Share not implemented'))),
+            onTap: () => ShareService.shareText(
+              context,
+              'Gitsawe - Ethiopian Orthodox daily readings',
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.widgets_outlined),
+            title: const Text('Add home screen widget'),
+            onTap: () async {
+              final added = await HomeWidgetService.instance.requestPinWidget();
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    added
+                        ? 'Choose a location for the Gitsawe widget.'
+                        : 'This launcher does not support adding widgets from the app.',
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),
