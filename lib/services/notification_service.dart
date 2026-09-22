@@ -18,7 +18,10 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
+  bool _initialized = false;
+
   Future<void> init() async {
+    if (_initialized) return;
     tz.initializeTimeZones();
 
     // Set the timezone used by zonedSchedule().
@@ -47,6 +50,7 @@ class NotificationService {
       settings: initSettings,
     );
 
+    _initialized = true;
     await _requestPermissions();
   }
 
@@ -114,11 +118,17 @@ class NotificationService {
   //   debugPrint('Instant test notification sent.');
   // }
 
+  Future<void> cancelAll() async {
+    if (!_initialized) return;
+    await _localNotifications.cancelAll();
+  }
+
   Future<void> scheduleDailyGitsaweNotification({
     required int hour,
     required int minute,
     required DailyGitsawe? Function(DateTime) readingProvider,
   }) async {
+    if (!_initialized) return;
     await _localNotifications.cancel(id: 0);
 
     final now = tz.TZDateTime.now(tz.local);

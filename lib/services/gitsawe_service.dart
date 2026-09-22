@@ -151,6 +151,17 @@ class GitsaweService {
     return _subFeasts.where((s) => s.feast == feastKey).toList();
   }
 
+  Future<void> clearCache() async {
+    _daily = [];
+    _feasts = [];
+    _subFeasts = [];
+    _months = [];
+    _monthlyGitsawe = [];
+    _seasonalGitsawe = [];
+    _mahlets = [];
+    _loaded = false;
+  }
+
   GitsaweMonth? monthByKey(String key) {
     if (!_loaded) return null;
     final matches = _months.where((m) => m.key == key);

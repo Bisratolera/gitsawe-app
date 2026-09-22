@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/app_settings.dart';
+import '../services/gitsawe_service.dart';
 import '../widgets/screen_wrapper.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -16,19 +17,45 @@ class SettingsScreen extends StatelessWidget {
           title: 'Settings',
           body: ListView(
             children: [
-              const _SettingsSection(
+              _SettingsSection(
                 title: 'General',
                 children: [
                   ListTile(
-                    leading: Icon(Icons.language),
-                    title: Text('Language'),
-                    subtitle: Text('Default (Amharic)'),
-                    trailing: Icon(Icons.chevron_right),
+                    leading: const Icon(Icons.language),
+                    title: const Text('Language'),
+                    subtitle: Text(AppSettings.instance.language == 'am' ? 'አማርኛ' : 'English'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => showDialog(
+                      context: context,
+                      builder: (_) => SimpleDialog(
+                        title: const Text('Language'),
+                        children: [
+                          SimpleDialogOption(
+                            onPressed: () {
+                              AppSettings.instance.setLanguage('am');
+                              Navigator.pop(context);
+                            },
+                            child: const Text('አማርኛ (Amharic)'),
+                          ),
+                          SimpleDialogOption(
+                            onPressed: () {
+                              AppSettings.instance.setLanguage('en');
+                              Navigator.pop(context);
+                            },
+                            child: const Text('English'),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   ListTile(
-                    leading: Icon(Icons.notifications),
-                    title: Text('Notifications'),
-                    trailing: Switch(value: true, onChanged: null),
+                    leading: const Icon(Icons.notifications),
+                    title: const Text('Notifications'),
+                    subtitle: Text(AppSettings.instance.notificationsEnabled ? 'On' : 'Off'),
+                    trailing: Switch(
+                      value: AppSettings.instance.notificationsEnabled,
+                      onChanged: AppSettings.instance.setNotificationsEnabled,
+                    ),
                   ),
                 ],
               ),
@@ -75,7 +102,9 @@ class SettingsScreen extends StatelessWidget {
                   ListTile(
                     leading: const Icon(Icons.delete_outline),
                     title: const Text('Clear Cache'),
-                    onTap: () {
+                    onTap: () async {
+                      await GitsaweService.instance.clearCache();
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Cache cleared')),
                       );

@@ -4,8 +4,13 @@ import '../core/theme/app_theme.dart';
 
 class GitsaweAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final bool showBackArrow;
 
-  const GitsaweAppBar({super.key, this.title = 'ግጻዌ'});
+  const GitsaweAppBar({
+    super.key,
+    this.title = 'ግጻዌ',
+    this.showBackArrow = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,12 +18,17 @@ class GitsaweAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: AppColors.maroon,
       elevation: 0,
       centerTitle: true,
-      leading: Builder(
-        builder: (context) => IconButton(
-          icon: const Icon(Icons.menu_open_rounded, color: Colors.white, size: 28),
-          onPressed: () => Scaffold.of(context).openDrawer(),
-        ),
-      ),
+      leading: showBackArrow
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.of(context).maybePop(),
+            )
+          : Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.menu_open_rounded, color: Colors.white, size: 28),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+              ),
+            ),
       title: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

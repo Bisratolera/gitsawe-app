@@ -47,10 +47,14 @@ class ScreenWrapper extends StatelessWidget {
     }
 
     return Scaffold(
+      extendBody: true,
       backgroundColor: AppColors.maroon,
-      appBar: showHeader ? GitsaweAppBar(title: title) : null,
+      appBar: showHeader ? GitsaweAppBar(title: title, showBackArrow: true,) : null,
       drawer: AppSidebar(currentIndex: currentIndex),
-      body: mainContent,
+      body: Padding(
+        padding: const EdgeInsets.only(bottom: 88),
+        child: mainContent,
+      ),
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -8,9 +8,6 @@ import '../screen/teachings_screen.dart';
 import '../screen/calendar_screen.dart';
 import '../screen/mahlet_screen.dart';
 import '../screen/search_screen.dart';
-import '../screen/bookmarks_screen.dart';
-import '../screen/settings_screen.dart';
-import '../screen/about_screen.dart';
 import '../screen/more_screen.dart';
 
 class AppSidebar extends StatelessWidget {
@@ -117,36 +114,17 @@ class AppSidebar extends StatelessWidget {
                 ),
                 _buildNavItem(
                   context,
+                  icon: Icons.more_horiz_outlined,
+                  label: 'More',
+                  index: 6,
+                  destination: const MoreScreen(),
+                ),
+                _buildNavItem(
+                  context,
                   icon: Icons.library_music_outlined,
                   label: 'Audio Library',
                   destination: const AudioLibraryScreen(),
                 ),
-                const Divider(),
-                _buildNavItem(
-                  context,
-                  icon: Icons.bookmarks_outlined,
-                  label: 'የእኔ (Bookmarks)',
-                  destination: const BookmarksScreen(),
-                ),
-                _buildNavItem(
-                  context,
-                  icon: Icons.settings_outlined,
-                  label: 'Settings',
-                  destination: const SettingsScreen(),
-                ),
-                _buildNavItem(
-                  context,
-                  icon: Icons.info_outlined,
-                  label: 'About',
-                  destination: const AboutScreen(),
-                ),
-                _buildNavItem(
-                  context,
-                  icon: Icons.more_horiz_outlined,
-                  label: 'More',
-                  destination: const MoreScreen(),
-                ),
-
               ],
             ),
           ),
@@ -173,9 +151,21 @@ class AppSidebar extends StatelessWidget {
     final isSelected = index != null && currentIndex == index;
 
     return ListTile(
-      leading: Icon(
-        icon,
-        color: isSelected ? colors.primary : colors.onSurfaceVariant,
+      leading: Container(
+        width: 36,
+        height: 36,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          // Fills the icon's background box with the SAME color as the
+          // icon itself when selected, instead of leaving it transparent/white.
+          color: isSelected ? colors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(
+          icon,
+          color: isSelected ? colors.onPrimary : colors.onSurfaceVariant,
+          size: 20,
+        ),
       ),
       title: Text(
         label,
@@ -185,9 +175,8 @@ class AppSidebar extends StatelessWidget {
         ),
       ),
       selected: isSelected,
-      selectedTileColor: AppColors.maroon.withOpacity(0.1),
       onTap: () {
-        Navigator.pop(context); // Close drawer
+        Navigator.pop(context);
         if (!isSelected) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => destination),

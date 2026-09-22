@@ -99,7 +99,7 @@ class _MahletDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: GitsaweAppBar(title: mahlet.title),
+      appBar: GitsaweAppBar(title: mahlet.title, showBackArrow: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

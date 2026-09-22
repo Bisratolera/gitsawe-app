@@ -102,7 +102,7 @@ class _DailyDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: GitsaweAppBar(title: daily.title),
+      appBar: GitsaweAppBar(title: daily.title, showBackArrow: false),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: GitsaweView(

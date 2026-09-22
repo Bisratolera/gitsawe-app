@@ -4,10 +4,4 @@
     <string name="widget_header_label">ግጻዌ</string>
     <string name="label_saint_of_the_day" translatable="false">SAINT OF THE DAY</string>
     <string name="label_mizbak_psalm" translatable="false">MIZBAK (PSALM)</string>
-    <string name="sample_date" translatable="false">ነሐሴ ፲፭ (Aug 21)</string>
-    <string name="sample_saint_name" translatable="false">St. Andrew the Apostle</string>
-    <string name="sample_psalm_line1" translatable="false">እግዚአብሔር ኖላዌየ ወአልቦ ዘየኅፅአኒ።</string>
-    <string name="sample_psalm_line2" translatable="false">ውስተ ብሔር ሣዕር ህየ አኅደረኒ።</string>
-    <string name="sample_psalm_line3" translatable="false">እግዚአብሔር እረኛዬ ነው፤ የሚያሳጣኝም የለም።</string>
-    <string name="sample_psalm_line4" translatable="false">በለመለመ መስክ ያሳድረኛል፤</string>
 </resources>

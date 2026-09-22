@@ -257,17 +257,26 @@ class _KidassieChip extends StatelessWidget {
   }
 }
 
-class GitsaweView extends StatelessWidget {
+class GitsaweView extends StatefulWidget {
   final DailyGitsawe entry;
   final String? dateLabel;
 
   const GitsaweView({super.key, required this.entry, this.dateLabel});
 
-  Future<void> _share(BuildContext context) async {
+  @override
+  State<GitsaweView> createState() => _GitsaweViewState();
+}
+
+class _GitsaweViewState extends State<GitsaweView> {
+  final GlobalKey _wholeKey = GlobalKey();
+  final GlobalKey _sinksarKey = GlobalKey();
+  final GlobalKey _misbakKey = GlobalKey();
+
+  Future<void> _shareText(BuildContext context) async {
     final text = [
-      entry.title,
-      if (dateLabel != null && dateLabel!.isNotEmpty) dateLabel!,
-      ...entry.snksar.take(3).map((item) => item.amharic),
+      widget.entry.title,
+      if (widget.dateLabel != null && widget.dateLabel!.isNotEmpty) widget.dateLabel!,
+      ...widget.entry.snksar.take(3).map((item) => item.amharic),
     ].join('\n');
     await ShareService.shareText(context, text);
   }
@@ -275,15 +284,14 @@ class GitsaweView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final sinksarDate = entry.date.split('-');
+    final sinksarDate = widget.entry.date.split('-');
     final day = int.tryParse(sinksarDate[0]) ?? 0;
     final month = int.tryParse(sinksarDate.length > 1 ? sinksarDate[1] : '0') ?? 0;
 
-    // Build queue for "Play all" button
     final List<AudioTrack> playAllQueue = [];
     void addToQueue(ReadingGroup group) {
       final List<List<Verse>> allReadings = [
-        group.msbak, group.firstDeacon, group.secondDeacon, group.secondKahn, group.wengel
+        group.msbak, group.firstDeacon, group.secondDeacon, group.secondKahn, group.wengel,
       ];
       for (final list in allReadings) {
         for (final v in list) {
@@ -292,10 +300,10 @@ class GitsaweView extends StatelessWidget {
         }
       }
     }
-    addToQueue(entry.negh);
-    addToQueue(entry.kidassie);
+    addToQueue(widget.entry.negh);
+    addToQueue(widget.entry.kidassie);
 
-    return Column(
+    final wholeReading = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _StatsHeader(),
@@ -305,22 +313,22 @@ class GitsaweView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              if (dateLabel != null && dateLabel!.isNotEmpty)
+              if (widget.dateLabel != null && widget.dateLabel!.isNotEmpty)
                 Text(
-                  dateLabel!, 
-                  textAlign: TextAlign.center, 
+                  widget.dateLabel!,
+                  textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant, letterSpacing: 2),
                 ),
               const SizedBox(height: 12),
               Text(
-                entry.title, 
-                textAlign: TextAlign.center, 
+                widget.entry.title,
+                textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: colors.primary, height: 1.4),
               ),
               ListenableBuilder(
                 listenable: BookmarkService.instance,
                 builder: (context, child) {
-                  final bookmarked = BookmarkService.instance.contains(entry.date, entry.title);
+                  final bookmarked = BookmarkService.instance.contains(widget.entry.date, widget.entry.title);
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -329,14 +337,14 @@ class GitsaweView extends StatelessWidget {
                         icon: Icon(bookmarked ? Icons.bookmark : Icons.bookmark_border),
                         color: colors.primary,
                         onPressed: () => BookmarkService.instance.toggle(
-                          Bookmark(date: entry.date, title: entry.title),
+                          Bookmark(date: widget.entry.date, title: widget.entry.title),
                         ),
                       ),
                       IconButton(
                         tooltip: 'Share reading',
                         icon: const Icon(Icons.share_outlined),
                         color: colors.primary,
-                        onPressed: () => _share(context),
+                        onPressed: () => _shareText(context),
                       ),
                     ],
                   );
@@ -351,7 +359,7 @@ class GitsaweView extends StatelessWidget {
             ],
           ),
         ),
-        if (entry.snksar.isNotEmpty) ...[
+        if (widget.entry.snksar.isNotEmpty) ...[
           const SizedBox(height: 40),
           Row(
             children: [
@@ -361,50 +369,91 @@ class GitsaweView extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Expanded(child: Divider(color: AppColors.maroon.withOpacity(0.2))),
+              IconButton(
+                tooltip: 'Share Sinksar',
+                icon: const Icon(Icons.share_outlined, size: 18),
+                color: colors.primary,
+                onPressed: () => ShareService.shareWidgetAsImage(
+                  context,
+                  _sinksarKey,
+                  fileName: 'sinksar-${widget.entry.date}',
+                  shareText: 'ስንክሳር — ${widget.entry.title}',
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
-          ManuscriptCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (var i = 0; i < entry.snksar.length; i++)
-                  Padding(
-                    padding: EdgeInsets.only(bottom: i == entry.snksar.length - 1 ? 0 : 16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${i + 1}.', 
-                          style: const TextStyle(fontSize: 14, color: AppColors.gold, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            entry.snksar[i].amharic, 
-                            style: TextStyle(fontSize: 15, height: 1.7, color: colors.onSurface),
+          RepaintBoundary(
+            key: _sinksarKey,
+            child: ManuscriptCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (var i = 0; i < widget.entry.snksar.length; i++)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: i == widget.entry.snksar.length - 1 ? 0 : 16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${i + 1}.',
+                            style: const TextStyle(fontSize: 14, color: AppColors.gold, fontWeight: FontWeight.bold),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              widget.entry.snksar[i].amharic,
+                              style: TextStyle(fontSize: 15, height: 1.7, color: colors.onSurface),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+        if (!widget.entry.negh.isEmpty) ...[
+          const SizedBox(height: 40),
+          RepaintBoundary(
+            key: _misbakKey,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(child: SectionBlock(title: 'ንባባተ ነግህ', section: widget.entry.negh)),
+                    IconButton(
+                      tooltip: 'Share Misbak',
+                      icon: const Icon(Icons.share_outlined, size: 18),
+                      color: colors.primary,
+                      onPressed: () => ShareService.shareWidgetAsImage(
+                        context,
+                        _misbakKey,
+                        fileName: 'misbak-${widget.entry.date}',
+                        shareText: 'ንባባተ ነግህ — ${widget.entry.title}',
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
         ],
-        if (!entry.negh.isEmpty) ...[
+        if (!widget.entry.kidassie.isEmpty) ...[
           const SizedBox(height: 40),
-          SectionBlock(title: 'ንባባተ ነግህ', section: entry.negh),
-        ],
-        if (!entry.kidassie.isEmpty) ...[
-          const SizedBox(height: 40),
-          SectionBlock(title: 'ንባባተ ቅዳሴ', section: entry.kidassie),
+          SectionBlock(title: 'ንባባተ ቅዳሴ', section: widget.entry.kidassie),
         ],
         if (month >= 1 && month <= 13) ...[
           const SizedBox(height: 40),
           SinksarSection(day: day, month: month),
         ],
       ],
+    );
+
+    return RepaintBoundary(
+      key: _wholeKey,
+      child: wholeReading,
     );
   }
 }
