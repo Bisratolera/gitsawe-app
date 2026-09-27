@@ -24,8 +24,9 @@
             android:gravity="center_vertical">
 
             <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:scaleType="fitCenter"
                 android:src="@drawable/widget_calendar"
                 android:tint="#4B2A2A"
                 android:contentDescription="@string/widget_header_label" />
@@ -43,8 +44,9 @@
                 android:fontFamily="serif" />
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:scaleType="fitCenter"
                 android:src="@drawable/widget_more"
                 android:tint="#4B2A2A"
                 android:contentDescription="@null" />

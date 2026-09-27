@@ -148,7 +148,11 @@ class SectionBlock extends StatelessWidget {
   final String title;
   final ReadingGroup? section;
 
-  const SectionBlock({super.key, required this.title, required this.section});
+  const SectionBlock({
+    super.key,
+    required this.title,
+    required this.section,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -303,10 +307,12 @@ class _GitsaweViewState extends State<GitsaweView> {
     addToQueue(widget.entry.negh);
     addToQueue(widget.entry.kidassie);
 
+    final currentMonthStr = sinksarDate.length > 1 ? sinksarDate[1] : '';
+
     final wholeReading = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _StatsHeader(),
+        _StatsHeader(currentMonth: currentMonthStr),
         const SizedBox(height: 24),
         ManuscriptCard(
           padding: const EdgeInsets.all(24),
@@ -369,17 +375,6 @@ class _GitsaweViewState extends State<GitsaweView> {
               ),
               const SizedBox(width: 12),
               Expanded(child: Divider(color: AppColors.maroon.withOpacity(0.2))),
-              IconButton(
-                tooltip: 'Share Sinksar',
-                icon: const Icon(Icons.share_outlined, size: 18),
-                color: colors.primary,
-                onPressed: () => ShareService.shareWidgetAsImage(
-                  context,
-                  _sinksarKey,
-                  fileName: 'sinksar-${widget.entry.date}',
-                  shareText: 'ስንክሳር — ${widget.entry.title}',
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -413,30 +408,44 @@ class _GitsaweViewState extends State<GitsaweView> {
               ),
             ),
           ),
+          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () => ShareService.shareWidgetAsImage(
+                context,
+                _sinksarKey,
+                fileName: 'sinksar-${widget.entry.date}',
+                shareText: 'ስንክሳር — ${widget.entry.title}',
+              ),
+              icon: const Icon(Icons.share_outlined, size: 16),
+              label: const Text('ስንክሳር አጋራ'),
+              style: TextButton.styleFrom(foregroundColor: colors.primary),
+            ),
+          ),
         ],
         if (!widget.entry.negh.isEmpty) ...[
           const SizedBox(height: 40),
           RepaintBoundary(
             key: _misbakKey,
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(child: SectionBlock(title: 'ንባባተ ነግህ', section: widget.entry.negh)),
-                    IconButton(
-                      tooltip: 'Share Misbak',
-                      icon: const Icon(Icons.share_outlined, size: 18),
-                      color: colors.primary,
-                      onPressed: () => ShareService.shareWidgetAsImage(
-                        context,
-                        _misbakKey,
-                        fileName: 'misbak-${widget.entry.date}',
-                        shareText: 'ንባባተ ነግህ — ${widget.entry.title}',
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+            child: SectionBlock(
+              title: 'ንባባተ ነግህ',
+              section: widget.entry.negh,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () => ShareService.shareWidgetAsImage(
+                context,
+                _misbakKey,
+                fileName: 'misbak-${widget.entry.date}',
+                shareText: 'ንባባተ ነግህ - ${widget.entry.title}',
+              ),
+              icon: const Icon(Icons.share_outlined, size: 16),
+              label: const Text('ንባባተ ነግህ አጋራ'),
+              style: TextButton.styleFrom(foregroundColor: colors.primary),
             ),
           ),
         ],
@@ -459,6 +468,10 @@ class _GitsaweViewState extends State<GitsaweView> {
 }
 
 class _StatsHeader extends StatelessWidget {
+  final String currentMonth;
+
+  const _StatsHeader({required this.currentMonth});
+
   @override
   Widget build(BuildContext context) {
     final service = GitsaweService.instance;
@@ -466,11 +479,31 @@ class _StatsHeader extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _StatCard(count: service.allDaily.length, label: 'የዕለት ግጻዌ'),
-          _StatCard(count: service.monthlyGitsawe.length, label: 'የወር ግጻዌ'),
-          _StatCard(count: service.seasonalGitsawe.length, label: 'የዘመን ግጻዌ'),
-          _StatCard(count: service.feastsForMonth('').length, label: 'በዓላት'), // Note: empty month matches all if not loaded? Service filters.
-          _StatCard(count: service.mahlets.length, label: 'ማኅሌት'),
+          _StatCard(
+            count: service.allDaily.length,
+            label: 'የዕለት ግጻዌ',
+            onTap: () => Navigator.pushNamed(context, '/daily_gitsawe'),
+          ),
+          _StatCard(
+            count: service.monthlyGitsawe.length,
+            label: 'የወር ግጻዌ',
+            onTap: () => Navigator.pushNamed(context, '/monthly_gitsawe'),
+          ),
+          _StatCard(
+            count: service.seasonalGitsawe.length,
+            label: 'የዘመን ግጻዌ',
+            onTap: () => Navigator.pushNamed(context, '/seasonal_gitsawe'),
+          ),
+          _StatCard(
+            count: service.feastsForMonth(currentMonth).length,
+            label: 'በዓላት',
+            onTap: () => Navigator.pushNamed(context, '/feasts'),
+          ),
+          _StatCard(
+            count: service.mahlets.length,
+            label: 'ማኅሌት',
+            onTap: () => Navigator.pushNamed(context, '/mahlet'),
+          ),
         ],
       ),
     );
@@ -480,34 +513,44 @@ class _StatsHeader extends StatelessWidget {
 class _StatCard extends StatelessWidget {
   final int count;
   final String label;
+  final VoidCallback onTap;
 
-  const _StatCard({required this.count, required this.label});
+  const _StatCard({required this.count, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Container(
-      width: 120,
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+    return Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: Material(
         color: colors.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colors.outlineVariant.withOpacity(0.45)),
-      ),
-      child: Column(
-        children: [
-          Text(
-            count.toString(),
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: colors.primary),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: 120,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: colors.outlineVariant.withOpacity(0.45)),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  count.toString(),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: colors.primary),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: TextStyle(fontSize: 11, color: colors.onSurfaceVariant),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(fontSize: 11, color: colors.onSurfaceVariant),
-            textAlign: TextAlign.center,
-          ),
-        ],
+        ),
       ),
     );
   }

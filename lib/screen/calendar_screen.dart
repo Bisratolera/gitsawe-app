@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import '../services/gitsawe_service.dart';
 import 'calendar_detail_screen.dart';
 
@@ -47,7 +48,7 @@ class CalendarScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: colors.surfaceContainerHighest,
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: colors.outlineVariant.withOpacity(0.45)),
                         boxShadow: [
@@ -72,7 +73,7 @@ class CalendarScreen extends StatelessWidget {
                                   color: colors.primary,
                                 ),
                               ),
-                              Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
+                              Icon(IconsaxPlusLinear.arrow_right_3, color: colors.onSurfaceVariant),
                             ],
                           ),
                           const SizedBox(height: 6),

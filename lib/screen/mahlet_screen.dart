@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/gitsawe_service.dart';
 import '../models/mahlet.dart';
 import '../widgets/gitsawe_app_bar.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 
 import '../widgets/screen_wrapper.dart';
 
@@ -42,7 +43,7 @@ class MahletScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: colors.surfaceContainerHighest,
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: colors.outlineVariant.withOpacity(0.45)),
                         boxShadow: [
@@ -69,7 +70,7 @@ class MahletScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              Icon(Icons.chevron_right, color: colors.onSurfaceVariant),
+                              Icon(IconsaxPlusLinear.arrow_right_3, color: colors.onSurfaceVariant),
                             ],
                           ),
                           if (mahlet.source != null && mahlet.source!.isNotEmpty) ...[

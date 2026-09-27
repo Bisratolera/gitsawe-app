@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import '../core/theme/app_theme.dart';
 import '../models/daily_gitsawe.dart';
 import '../services/gitsawe_service.dart';
@@ -43,7 +44,7 @@ class DailyGitsaweScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: colors.surfaceContainerHighest,
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: AppColors.maroon.withOpacity(0.12)),
                         boxShadow: [
@@ -113,7 +114,7 @@ class DailyGitsaweScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                          const Icon(Icons.chevron_right, color: AppColors.maroon),
+                          const Icon(IconsaxPlusLinear.arrow_right_3, color: AppColors.maroon),
                         ],
                       ),
                     ),
@@ -136,8 +137,8 @@ class DailyGitsaweScreen extends StatelessWidget {
     if (parts.length < 2) return 'Month';
     final monthNumber = int.tryParse(parts[1]) ?? 1;
     const months = [
-      'Meskerem', 'Tikimt', 'Hidar', 'Tahsas', 'Tir', 'Yekatit', 'Megabit', 'Miazia',
-      'Ginbot', 'Sene', 'Hamle', 'Nehase', 'Pagume'
+      'መስከረም', 'ጥቅምት', 'ህዳር', 'ታህሳስ', 'ጥርር', 'የካቲት', 'መጋቢት', 'ሚያዝያ',
+      'ግንቦት', 'ሰኔ', 'ሓምሌ', 'ነሃሴ', 'ጳጉሜ'
     ];
     return months[(monthNumber - 1).clamp(0, months.length - 1)];
   }

@@ -1,5 +1,6 @@
 // widgets/gitsawe_app_bar.dart
 import 'package:flutter/material.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import '../core/theme/app_theme.dart';
 
 class GitsaweAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -20,12 +21,17 @@ class GitsaweAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       leading: showBackArrow
           ? IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              icon: Image.asset(
+                'assets/images/splash.png',
+                width: 30,
+                height: 30,
+                fit: BoxFit.contain,
+              ),
               onPressed: () => Navigator.of(context).maybePop(),
             )
           : Builder(
               builder: (context) => IconButton(
-                icon: const Icon(Icons.menu_open_rounded, color: Colors.white, size: 28),
+                icon: const Icon(IconsaxPlusLinear.menu, color: Colors.white, size: 28),
                 onPressed: () => Scaffold.of(context).openDrawer(),
               ),
             ),
@@ -56,7 +62,7 @@ class GitsaweAppBar extends StatelessWidget implements PreferredSizeWidget {
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
           child: IconButton(
-            icon: const Icon(Icons.notifications_none_outlined, color: Colors.white),
+            icon: const Icon(IconsaxPlusLinear.notification, color: Colors.white),
             onPressed: () {},
           ),
         ),

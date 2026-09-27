@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
@@ -19,10 +20,18 @@ class HomeWidgetService {
   HomeWidgetService._internal();
   static final HomeWidgetService instance = HomeWidgetService._internal();
 
-  /// Must match the class name of GitsaweWidgetProvider.kt.
-  static const String _androidWidgetName = 'GitsaweWidgetProvider';
-  static const String _qualifiedAndroidWidgetName =
-      'com.example.gitsawe.GitsaweWidgetProvider';
+  /// Keep only the summary widget available so the home screen doesn't show
+  /// multiple competing widget variants.
+  static const String _androidPinWidgetName = 'GitsaweWidgetMediumProvider';
+  static const List<String> _androidWidgetNames = [
+    'GitsaweWidgetSmallProvider',
+    'GitsaweWidgetCompactProvider',
+    'GitsaweWidgetMediumProvider',
+    'GitsaweWidgetLargeProvider',
+    'GitsaweWidgetCustomProvider',
+    'GitsaweReadingWidgetProvider',
+    'GitsaweVerseWidgetProvider',
+  ];
 
   /// Must match the `kind:` string used in the iOS WidgetKit extension.
   static const String _iOSWidgetKind = 'GitsaweWidget';
@@ -35,13 +44,18 @@ class HomeWidgetService {
   static const String keyDailyCache = 'gitsawe_daily_cache';
   static const String keyUpdatedAt = 'gitsawe_updated_at';
 
-  Future<bool> requestPinWidget() async {
+  Future<bool> requestPinWidget({String? androidName}) async {
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      debugPrint('HomeWidgetService.requestPinWidget skipped: unsupported platform ${Platform.operatingSystem}.');
+      return false;
+    }
+
     try {
       final supported = await HomeWidget.isRequestPinWidgetSupported() ?? false;
       if (!supported) return false;
 
       await HomeWidget.requestPinWidget(
-        qualifiedAndroidName: _qualifiedAndroidWidgetName,
+        androidName: androidName ?? _androidPinWidgetName,
       );
       return true;
     } catch (e, st) {
@@ -71,18 +85,36 @@ class HomeWidgetService {
     required String ethiopianDateLabel,
     DailyGitsawe? reading,
   }) async {
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      debugPrint('HomeWidgetService.updateWidget skipped: unsupported platform ${Platform.operatingSystem}.');
+      return;
+    }
+
     try {
       debugPrint('HomeWidgetService: Updating widget with $ethiopianDateLabel');
       final title = reading?.title ?? 'ዛሬ ንባብ አልተገኘም';
       final snksar = (reading != null && reading.snksar.isNotEmpty)
           ? reading.snksar.first.amharic
           : 'ለዛሬ ስንክሳር የለም';
+
+      String verseText = '”የቅዱሳን መታሰቢያ ለበረከት ነው።”';
+      String verseRef = 'ምሳሌ 10:7';
+      if (reading != null && reading.negh.msbak.isNotEmpty) {
+        final v = reading.negh.msbak.first;
+        if (v.text.amharic.isNotEmpty) {
+          verseText = v.text.amharic;
+          verseRef = v.verse.display.isNotEmpty ? '${v.verse.bookTitle} ${v.verse.display}' : v.verse.bookTitle;
+        }
+      }
+
       final cacheJson = buildDailyCacheJson(GitsaweService.instance.allDaily);
 
       await Future.wait([
         HomeWidget.saveWidgetData<String>(keyDate, ethiopianDateLabel),
         HomeWidget.saveWidgetData<String>(keyTitle, title),
         HomeWidget.saveWidgetData<String>(keySnksar, snksar),
+        HomeWidget.saveWidgetData<String>('gitsawe_verse_text', verseText),
+        HomeWidget.saveWidgetData<String>('gitsawe_verse_ref', verseRef),
         HomeWidget.saveWidgetData<String>(keyDailyCache, cacheJson),
         HomeWidget.saveWidgetData<String>(
           keyUpdatedAt,
@@ -90,10 +122,13 @@ class HomeWidgetService {
         ),
       ]);
 
-      await HomeWidget.updateWidget(
-        androidName: _androidWidgetName,
-        iOSName: _iOSWidgetKind,
-      );
+      await Future.wait([
+        for (final androidName in _androidWidgetNames)
+          HomeWidget.updateWidget(
+            androidName: androidName,
+            iOSName: _iOSWidgetKind,
+          ),
+      ]);
       debugPrint('HomeWidgetService: Widget update signals sent');
     } catch (e, st) {
       // Widget refresh is best-effort; never let it crash the app.

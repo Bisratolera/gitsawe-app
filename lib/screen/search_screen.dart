@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import '../models/daily_gitsawe.dart';
 import '../services/gitsawe_service.dart';
 import '../widgets/gitsawe_app_bar.dart';
@@ -81,7 +82,7 @@ class _SearchBodyState extends State<_SearchBody> {
                   child: ListTile(
                     title: Text(d.title),
                     subtitle: Text(d.date),
-                    trailing: const Icon(Icons.chevron_right),
+                    trailing: const Icon(IconsaxPlusLinear.arrow_right_3),
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => _DailyDetail(d))
                     ),

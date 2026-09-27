@@ -1,13 +1,25 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import '../models/audio.dart';
 
 class AudioPlayerService extends ChangeNotifier {
-  AudioPlayerService._internal();
   static final AudioPlayerService instance = AudioPlayerService._internal();
 
   final AudioPlayer _player = AudioPlayer();
+  late final StreamSubscription<PlayerState> _playerStateSubscription;
   List<AudioTrack> _queue = [];
+
+  AudioPlayerService._internal() {
+    _playerStateSubscription = _player.playerStateStream.listen((state) {
+      if (state.processingState == ProcessingState.completed) {
+        _queue = [];
+        notifyListeners();
+      }
+    });
+  }
 
   List<AudioTrack> get queue => _queue;
   Stream<Duration> get positionStream => _player.positionStream;
@@ -28,11 +40,21 @@ class AudioPlayerService extends ChangeNotifier {
   Future<void> playTracks(List<AudioTrack> tracks, {int startIndex = 0}) async {
     if (tracks.isEmpty) return;
     _queue = tracks;
+    notifyListeners();
 
     try {
       final playlist = ConcatenatingAudioSource(
         children: tracks
-            .map((t) => AudioSource.uri(Uri.parse(t.url), tag: t))
+            .map(
+              (t) => AudioSource.uri(
+                Uri.parse(t.url),
+                tag: MediaItem(
+                  id: t.id,
+                  album: 'Gitsawe',
+                  title: t.title,
+                ),
+              ),
+            )
             .toList(),
       );
 
@@ -74,6 +96,7 @@ class AudioPlayerService extends ChangeNotifier {
 
   @override
   void dispose() {
+    _playerStateSubscription.cancel();
     _player.dispose();
     super.dispose();
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 
 import '../core/theme/app_theme.dart';
 import '../models/appostles.dart';
@@ -51,7 +52,7 @@ class TeachingsScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: colors.surfaceContainerHighest,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: AppColors.maroon.withOpacity(0.15)),
                   ),
@@ -64,7 +65,7 @@ class TeachingsScreen extends StatelessWidget {
                           color: AppColors.maroon.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.menu_book_rounded, color: AppColors.maroon),
+                        child: const Icon(IconsaxPlusLinear.book_1, color: AppColors.maroon),
                       ),
                       const SizedBox(width: 14),
                       Expanded(

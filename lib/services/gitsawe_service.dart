@@ -31,24 +31,26 @@ class GitsaweService {
   /// Raw access to all daily entries for search or offline features.
   List<DailyGitsawe> get allDaily => _loaded ? _daily : [];
 
-  /// Loads and parses everything from the Gitsawe API. Falls back to local
-  /// assets if the API is unreachable.
-  Future<void> load({bool forceRefresh = false}) async {
+  /// Loads from bundled assets by default. The remote Gitsawe URL is currently
+  /// unreliable/returns 400s, so the app intentionally ignores internet-driven
+  /// updates and uses the checked-in fixtures until a stable backend is restored.
+  Future<void> load({bool forceRefresh = false, bool allowRemote = false}) async {
     if (_loaded && !forceRefresh) return;
 
     try {
-      debugPrint('GitsaweService: Attempting to load from API...');
-      await _loadFromApi();
-      debugPrint('GitsaweService: Loaded from API successfully.');
-    } catch (e) {
-      debugPrint('GitsaweService: API load failed ($e). Falling back to local assets...');
-      try {
-        await _loadFromAssets();
-        debugPrint('GitsaweService: Loaded from local assets successfully.');
-      } catch (assetError, stackTrace) {
-        debugPrint('GitsaweService: Asset fallback also failed: $assetError\n$stackTrace');
-        rethrow;
+      if (allowRemote) {
+        debugPrint('GitsaweService: Attempting to load from API...');
+        await _loadFromApi();
+        debugPrint('GitsaweService: Loaded from API successfully.');
+        return;
       }
+
+      debugPrint('GitsaweService: Using local asset data (remote API disabled).');
+      await _loadFromAssets();
+      debugPrint('GitsaweService: Loaded from local assets successfully.');
+    } catch (e, stackTrace) {
+      debugPrint('GitsaweService: Asset load failed: $e\n$stackTrace');
+      rethrow;
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 
 import '../services/app_settings.dart';
 import '../services/gitsawe_service.dart';
@@ -21,10 +22,10 @@ class SettingsScreen extends StatelessWidget {
                 title: 'General',
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.language),
+                    leading: const Icon(IconsaxPlusLinear.language_square),
                     title: const Text('Language'),
                     subtitle: Text(AppSettings.instance.language == 'am' ? 'አማርኛ' : 'English'),
-                    trailing: const Icon(Icons.chevron_right),
+                    trailing: const Icon(IconsaxPlusLinear.arrow_right_3),
                     onTap: () => showDialog(
                       context: context,
                       builder: (_) => SimpleDialog(
@@ -49,7 +50,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
                   ListTile(
-                    leading: const Icon(Icons.notifications),
+                    leading: const Icon(IconsaxPlusLinear.notification),
                     title: const Text('Notifications'),
                     subtitle: Text(AppSettings.instance.notificationsEnabled ? 'On' : 'Off'),
                     trailing: Switch(
@@ -63,7 +64,7 @@ class SettingsScreen extends StatelessWidget {
                 title: 'Appearance',
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.text_format),
+                    leading: const Icon(IconsaxPlusLinear.text),
                     title: const Text('Font Size'),
                     subtitle: Text(_fontSizeLabel(AppSettings.instance.textScale)),
                     trailing: Row(
@@ -74,20 +75,20 @@ class SettingsScreen extends StatelessWidget {
                           onPressed: () => AppSettings.instance.setTextScale(
                             AppSettings.instance.textScale - 0.1,
                           ),
-                          icon: const Icon(Icons.remove),
+                          icon: const Icon(IconsaxPlusLinear.minus),
                         ),
                         IconButton(
                           tooltip: 'Increase text size',
                           onPressed: () => AppSettings.instance.setTextScale(
                             AppSettings.instance.textScale + 0.1,
                           ),
-                          icon: const Icon(Icons.add),
+                          icon: const Icon(IconsaxPlusLinear.add),
                         ),
                       ],
                     ),
                   ),
                   ListTile(
-                    leading: const Icon(Icons.dark_mode),
+                    leading: const Icon(IconsaxPlusLinear.moon),
                     title: const Text('Dark Mode'),
                     trailing: Switch(
                       value: AppSettings.instance.isDarkMode,
@@ -100,7 +101,7 @@ class SettingsScreen extends StatelessWidget {
                 title: 'Storage',
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.delete_outline),
+                    leading: const Icon(IconsaxPlusLinear.trash),
                     title: const Text('Clear Cache'),
                     onTap: () async {
                       await GitsaweService.instance.clearCache();

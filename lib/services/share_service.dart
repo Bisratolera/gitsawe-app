@@ -28,8 +28,19 @@ class ShareService {
     String? shareText,
   }) async {
     try {
-      final boundary = boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      await WidgetsBinding.instance.endOfFrame;
+      var boundary = boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
       if (boundary == null) throw StateError('Nothing to capture yet.');
+      if (!boundary.attached || !boundary.hasSize) {
+        throw StateError('The content is not ready to capture yet.');
+      }
+      if (boundary.debugNeedsPaint) {
+        await WidgetsBinding.instance.endOfFrame;
+        boundary = boundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+        if (boundary == null || !boundary.attached || !boundary.hasSize || boundary.debugNeedsPaint) {
+          throw StateError('The content is still being rendered.');
+        }
+      }
 
       final image = await boundary.toImage(pixelRatio: 3);
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);

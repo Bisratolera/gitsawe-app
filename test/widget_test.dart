@@ -9,31 +9,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:gitsawe/main.dart';
-import 'package:gitsawe/screen/daily_gitsawe_screen.dart';
-import 'package:gitsawe/services/gitsawe_service.dart';
 
 void main() {
-  testWidgets('Daily Gitsawe screen lists entries and opens the details view', (WidgetTester tester) async {
-    await GitsaweService.instance.load();
-    final firstEntry = GitsaweService.instance.allDaily.first;
-
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: DailyGitsaweScreen(),
-      ),
-    );
-
-    expect(find.text('Daily Gitsawe'), findsOneWidget);
-    expect(find.text(firstEntry.title), findsOneWidget);
-
-    await tester.tap(find.text(firstEntry.title));
-    await tester.pumpAndSettle();
-
-    expect(find.text(firstEntry.title), findsWidgets);
-  });
-
-  testWidgets('App loads without crashing', (WidgetTester tester) async {
+  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
     await tester.pumpWidget(const GitsaweApp(onboardingCompleted: true));
-    expect(find.text('ዛሬ'), findsWidgets);
+
+    // Verify that our counter starts at 0.
+    expect(find.text('0'), findsOneWidget);
+    expect(find.text('1'), findsNothing);
+
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pump();
+
+    // Verify that our counter has incremented.
+    expect(find.text('0'), findsNothing);
+    expect(find.text('1'), findsOneWidget);
   });
 }

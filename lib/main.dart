@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/utils/ethiopian_calendar.dart';
 import 'screen/today_screen.dart';
 import 'screen/onboarding_screen.dart';
+import 'screen/daily_gitsawe_screen.dart';
+import 'screen/calendar_screen.dart';
+import 'screen/mahlet_screen.dart';
 import 'services/gitsawe_service.dart';
-import 'services/home_widget_service.dart';
+import 'services/gitsawe_widgets_service.dart';
 import 'services/notification_service.dart';
 import 'services/audio_library_service.dart';
 import 'services/sinksar_service.dart';
@@ -15,9 +19,15 @@ import 'services/bookmark_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.example.gitsawe.audio',
+    androidNotificationChannelName: 'Gitsawe audio playback',
+    androidNotificationOngoing: true,
+  );
 
   final prefs = await SharedPreferences.getInstance();
   final bool onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
+
   await AppSettings.instance.load();
   await BookmarkService.instance.load();
 
@@ -25,12 +35,13 @@ Future<void> main() async {
   // (e.g. offline at launch), TodayScreen retries once it's mounted.
   try {
     await Future.wait([
-      GitsaweService.instance.load(),
+      GitsaweService.instance.load(allowRemote: false),
       AudioLibraryService.instance.load(),
       SinksarService.instance.loadManifest(),
     ]);
+    await GitsaweWidgetsService.instance.init();
     final eDate = EthiopianDate.fromGregorian(DateTime.now());
-    await HomeWidgetService.instance.updateWidget(
+    await GitsaweWidgetsService.instance.updateAllWidgets(
       ethiopianDateLabel: '${eDate.day}/${eDate.month}/${eDate.year}',
       reading: GitsaweService.instance.readingFor(DateTime.now()),
     );
@@ -83,6 +94,13 @@ class GitsaweApp extends StatelessWidget {
             );
           },
           home: onboardingCompleted ? const TodayScreen() : const OnboardingScreen(),
+          routes: {
+            '/daily_gitsawe': (context) => const DailyGitsaweScreen(),
+            '/monthly_gitsawe': (context) => const CalendarScreen(),
+            '/seasonal_gitsawe': (context) => const CalendarScreen(),
+            '/feasts': (context) => const CalendarScreen(),
+            '/mahlet': (context) => const MahletScreen(),
+          },
         );
       },
     );

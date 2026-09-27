@@ -22,6 +22,14 @@ class NotificationService {
 
   Future<void> init() async {
     if (_initialized) return;
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      debugPrint(
+        'NotificationService: notifications are unavailable on ${Platform.operatingSystem}.',
+      );
+      _initialized = true;
+      return;
+    }
+
     tz.initializeTimeZones();
 
     // Set the timezone used by zonedSchedule().
@@ -41,9 +49,15 @@ class NotificationService {
       requestSoundPermission: false,
     );
 
+    const LinuxInitializationSettings linuxSettings =
+        LinuxInitializationSettings(
+      defaultActionName: 'Open Gitsawe',
+    );
+
     const InitializationSettings initSettings = InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,
+      linux: linuxSettings,
     );
 
     await _localNotifications.initialize(
@@ -128,7 +142,7 @@ class NotificationService {
     required int minute,
     required DailyGitsawe? Function(DateTime) readingProvider,
   }) async {
-    if (!_initialized) return;
+    if (!_initialized || (!Platform.isAndroid && !Platform.isIOS)) return;
     await _localNotifications.cancel(id: 0);
 
     final now = tz.TZDateTime.now(tz.local);

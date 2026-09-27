@@ -4,4 +4,5 @@
     <string name="widget_header_label">ግጻዌ</string>
     <string name="label_saint_of_the_day" translatable="false">SAINT OF THE DAY</string>
     <string name="label_mizbak_psalm" translatable="false">MIZBAK (PSALM)</string>
+    <string name="widget_medium_name" translatable="false">Gitsawe Summary</string>
 </resources>

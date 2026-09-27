@@ -10,6 +10,21 @@ class AppColors {
   static const secondary = Color(0xFFE9E4DE);
 }
 
+class _NoTransitionBuilder extends PageTransitionsBuilder {
+  const _NoTransitionBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return child;
+  }
+}
+
 class AppTheme {
   static ThemeData get theme {
     return ThemeData(
@@ -54,39 +69,65 @@ class AppTheme {
         thickness: 1,
         color: Colors.black12,
       ),
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: _NoTransitionBuilder(),
+          TargetPlatform.iOS: _NoTransitionBuilder(),
+          TargetPlatform.macOS: _NoTransitionBuilder(),
+          TargetPlatform.windows: _NoTransitionBuilder(),
+          TargetPlatform.linux: _NoTransitionBuilder(),
+          TargetPlatform.fuchsia: _NoTransitionBuilder(),
+        },
+      ),
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Colors.transparent,
+      splashColor: Colors.transparent,
       fontFamily: 'NotoSansEthiopic',
     );
   }
 
-static ThemeData get darkTheme {
-  final scheme = ColorScheme.fromSeed(
-    seedColor: AppColors.gold,
-    brightness: Brightness.dark,
-  );
-  return ThemeData(
-    useMaterial3: true,
-    brightness: Brightness.dark,
-    scaffoldBackgroundColor: const Color(0xFF171114),
-    colorScheme: scheme,
-    appBarTheme: AppBarTheme(
-      backgroundColor: scheme.surface,
-      foregroundColor: Colors.white,
-      elevation: 0,
-      centerTitle: true,
-    ),
-    cardTheme: CardThemeData(
-      elevation: 0,
-      color: scheme.surfaceContainerHigh,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
-    ),
-    textTheme: const TextTheme(
-      bodyLarge: TextStyle(color: Colors.white, fontFamily: 'NotoSansEthiopic'),
-      bodyMedium: TextStyle(color: Colors.white, fontFamily: 'NotoSansEthiopic'),
-      bodySmall: TextStyle(color: Color(0xFFCEC4C7), fontFamily: 'NotoSansEthiopic'),
-      titleLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'NotoSansEthiopic'),
-    ),
-    dividerTheme: DividerThemeData(thickness: 1, color: scheme.outlineVariant),
-    fontFamily: 'NotoSansEthiopic',
-  );
-}
+  static ThemeData get darkTheme {
+    final scheme = ColorScheme.fromSeed(
+      seedColor: AppColors.gold,
+      brightness: Brightness.dark,
+    );
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: const Color(0xFF171114),
+      colorScheme: scheme,
+      appBarTheme: AppBarTheme(
+        backgroundColor: scheme.surface,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        color: scheme.surfaceContainerHigh,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+      ),
+      textTheme: const TextTheme(
+        bodyLarge: TextStyle(color: Colors.white, fontFamily: 'NotoSansEthiopic'),
+        bodyMedium: TextStyle(color: Colors.white, fontFamily: 'NotoSansEthiopic'),
+        bodySmall: TextStyle(color: Color(0xFFCEC4C7), fontFamily: 'NotoSansEthiopic'),
+        titleLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'NotoSansEthiopic'),
+      ),
+      dividerTheme: DividerThemeData(thickness: 1, color: scheme.outlineVariant),
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: _NoTransitionBuilder(),
+          TargetPlatform.iOS: _NoTransitionBuilder(),
+          TargetPlatform.macOS: _NoTransitionBuilder(),
+          TargetPlatform.windows: _NoTransitionBuilder(),
+          TargetPlatform.linux: _NoTransitionBuilder(),
+          TargetPlatform.fuchsia: _NoTransitionBuilder(),
+        },
+      ),
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Colors.transparent,
+      splashColor: Colors.transparent,
+      fontFamily: 'NotoSansEthiopic',
+    );
+  }
 }

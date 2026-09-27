@@ -31,7 +31,7 @@ class _TodayScreenState extends State<TodayScreen> {
       _error = null;
     });
     try {
-      await GitsaweService.instance.load();
+      await GitsaweService.instance.load(allowRemote: false);
       final reading = GitsaweService.instance.readingFor(DateTime.now());
       if (mounted) {
         setState(() {

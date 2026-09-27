@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 
 class AppBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -15,7 +16,7 @@ class AppBottomNav extends StatelessWidget {
       child: Container(
         height: 64,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
@@ -38,13 +39,13 @@ class AppBottomNav extends StatelessWidget {
             backgroundColor: Colors.transparent,
             type: BottomNavigationBarType.fixed,
             items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.today_outlined), activeIcon: Icon(Icons.today), label: 'የዛሬ'),
-              BottomNavigationBarItem(icon: Icon(Icons.calendar_view_day_outlined), activeIcon: Icon(Icons.calendar_view_day), label: 'የየእለት'),
-              BottomNavigationBarItem(icon: Icon(Icons.menu_book_rounded), activeIcon: Icon(Icons.menu_book_rounded), label: 'ትምህርቶች'),
-              BottomNavigationBarItem(icon: Icon(Icons.calendar_month_outlined), activeIcon: Icon(Icons.calendar_month), label: 'የወር'),
-              BottomNavigationBarItem(icon: Icon(Icons.music_note_outlined), activeIcon: Icon(Icons.music_note), label: 'ማኅሌት'),
-              BottomNavigationBarItem(icon: Icon(Icons.search_outlined), activeIcon: Icon(Icons.search), label: 'ፍለጋ'),
-              BottomNavigationBarItem(icon: Icon(Icons.more_horiz_outlined), activeIcon: Icon(Icons.more_horiz), label: 'More'),
+              BottomNavigationBarItem(icon: Icon(IconsaxPlusLinear.calendar), activeIcon: Icon(IconsaxPlusBold.calendar), label: 'የዛሬ'),
+              BottomNavigationBarItem(icon: Icon(IconsaxPlusLinear.calendar_2), activeIcon: Icon(IconsaxPlusBold.calendar_2), label: 'የየእለት'),
+              BottomNavigationBarItem(icon: Icon(IconsaxPlusLinear.book), activeIcon: Icon(IconsaxPlusBold.book), label: 'ትምህርቶች'),
+              BottomNavigationBarItem(icon: Icon(IconsaxPlusLinear.calendar_search), activeIcon: Icon(IconsaxPlusBold.calendar_search), label: 'የወር'),
+              BottomNavigationBarItem(icon: Icon(IconsaxPlusLinear.music), activeIcon: Icon(IconsaxPlusBold.music), label: 'ማኅሌት'),
+              BottomNavigationBarItem(icon: Icon(IconsaxPlusLinear.search_normal), activeIcon: Icon(IconsaxPlusBold.search_normal), label: 'ፍለጋ'),
+              BottomNavigationBarItem(icon: Icon(IconsaxPlusLinear.more), activeIcon: Icon(IconsaxPlusBold.more), label: 'ተጨማሪ'),
             ],
           ),
         ),

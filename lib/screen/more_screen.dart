@@ -4,7 +4,7 @@ import 'settings_screen.dart';
 import 'about_screen.dart';
 import 'audio_library_screen.dart';
 import 'teachings_screen.dart';
-
+import 'package:iconsax_plus/iconsax_plus.dart';
 import '../services/gitsawe_service.dart';
 import '../services/home_widget_service.dart';
 import '../services/missed_updates_service.dart';
@@ -22,7 +22,7 @@ class MoreScreen extends StatelessWidget {
       body: ListView(
         children: [
           ListTile(
-            leading: const Icon(Icons.notifications_active_outlined),
+            leading: const Icon(IconsaxPlusLinear.notification),
             title: const Text('Missed updates'),
             trailing: ListenableBuilder(
               listenable: MissedUpdatesService.instance,
@@ -43,48 +43,112 @@ class MoreScreen extends StatelessWidget {
             onTap: () => MissedUpdatesService.instance.showMissedSheet(context),
           ),
           ListTile(
-            leading: const Icon(Icons.bookmarks),
+            leading: Icon(IconsaxPlusLinear.bookmark_2),
             title: const Text('Bookmarks'),
             onTap: () => Navigator.of(context)
                 .push(MaterialPageRoute(builder: (_) => const BookmarksScreen())),
           ),
           ListTile(
-            leading: const Icon(Icons.menu_book_rounded),
+            leading: const Icon(IconsaxPlusLinear.book),
             title: const Text('Teachings'),
             onTap: () => Navigator.of(context)
                 .push(MaterialPageRoute(builder: (_) => const TeachingsScreen())),
           ),
           ListTile(
-            leading: const Icon(Icons.library_music_outlined),
+            leading: const Icon(IconsaxPlusLinear.music),
             title: const Text('Audio Library'),
             onTap: () => Navigator.of(context)
                 .push(MaterialPageRoute(builder: (_) => const AudioLibraryScreen())),
           ),
           ListTile(
-            leading: const Icon(Icons.widgets_outlined),
+            leading: const Icon(IconsaxPlusLinear.box_1),
             title: const Text('Add home screen widget'),
+            subtitle: const Text('Choose from multiple Gitsawe widgets'),
             onTap: () async {
-              final added = await HomeWidgetService.instance.requestPinWidget();
-              if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    added
-                        ? 'Choose a location for the Gitsawe widget.'
-                        : 'This launcher does not support adding widgets from the app.',
-                  ),
-                ),
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return SafeArea(
+                    child: Wrap(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text(
+                            'የ መግብያ (Widget) ዓይነት ይምረጡ',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.article),
+                          title: const Text('የዕለቱ ንባብ እና ስንክሳር (Reading Widget)'),
+                          onTap: () async {
+                            Navigator.pop(context);
+                            final added = await HomeWidgetService.instance.requestPinWidget(
+                              androidName: 'GitsaweReadingWidgetProvider',
+                            );
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(added ? 'ንባብ መግብያ ተጠይቋል' : 'መግብያ መጠየቅ አልተቻለም')),
+                            );
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.menu_book),
+                          title: const Text('የዕለቱ ምስባክ እና ቃል (Verse Widget)'),
+                          onTap: () async {
+                            Navigator.pop(context);
+                            final added = await HomeWidgetService.instance.requestPinWidget(
+                              androidName: 'GitsaweVerseWidgetProvider',
+                            );
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(added ? 'ምስባክ መግብያ ተጠይቋል' : 'መግብያ መጠየቅ አልተቻለም')),
+                            );
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.widgets),
+                          title: const Text('መካከለኛ ግጻዌ መግብያ (Medium Widget)'),
+                          onTap: () async {
+                            Navigator.pop(context);
+                            final added = await HomeWidgetService.instance.requestPinWidget(
+                              androidName: 'GitsaweWidgetMediumProvider',
+                            );
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(added ? 'መካከለኛ መግብያ ተጠይቋል' : 'መግብያ መጠየቅ አልተቻለም')),
+                            );
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.view_compact),
+                          title: const Text('ጥቅል ግጻዌ መግብያ (Compact Widget)'),
+                          onTap: () async {
+                            Navigator.pop(context);
+                            final added = await HomeWidgetService.instance.requestPinWidget(
+                              androidName: 'GitsaweWidgetCompactProvider',
+                            );
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(added ? 'ጥቅል መግብያ ተጠይቋል' : 'መግብያ መጠየቅ አልተቻለም')),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
               );
             },
           ),
           ListTile(
-            leading: const Icon(Icons.settings),
+            leading: const Icon(IconsaxPlusLinear.setting),
             title: const Text('Settings'),
             onTap: () => Navigator.of(context)
                 .push(MaterialPageRoute(builder: (_) => const SettingsScreen())),
           ),
           ListTile(
-            leading: const Icon(Icons.share),
+            leading: const Icon(IconsaxPlusLinear.share),
             title: const Text('Share Gitsawe app'),
             onTap: () => ShareService.shareText(
               context,
@@ -92,7 +156,7 @@ class MoreScreen extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.delete_outline),
+            leading: const Icon(IconsaxPlusLinear.trash),
             title: const Text('Clear cache'),
             subtitle: const Text('Refetches today\'s reading and audio index'),
             onTap: () async {
@@ -104,7 +168,7 @@ class MoreScreen extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.info_outline),
+            leading: const Icon(IconsaxPlusLinear.info_circle),
             title: const Text('About'),
             onTap: () => Navigator.of(context)
                 .push(MaterialPageRoute(builder: (_) => const AboutScreen())),
