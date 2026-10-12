@@ -20,7 +20,7 @@ jobs:
 
       - run: flutter pub get
       - run: flutter analyze
-      - run: flutter test
+      - run: flutter test --platform tester
 
   build_android:
     needs: analyze_and_test
