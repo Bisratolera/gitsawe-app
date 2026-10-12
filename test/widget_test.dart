@@ -17,15 +17,13 @@ void main() {
   });
 
   testWidgets('GitsaweApp renders home view successfully smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+    // Build the app and give the home screen a couple of frames to render.
     await tester.pumpWidget(const GitsaweApp(onboardingCompleted: true));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
-    // Wait for any animations, loading states, or future builders to fully settle
-    await tester.pumpAndSettle();
-
-    // Verify your actual application successfully loaded instead of checking for "0".
-    // TODO: Replace 'Home' with a word, title, or icon that actually exists on your main screen.
-    // Example for localization check: find.text('ግጻዌ') or find.text('Gitsawe')
+    // Verify the app's actual home screen loads and shows the expected title.
     expect(find.byType(MaterialApp), findsOneWidget);
+    expect(find.text('የዕለቱ ግጻዌ'), findsOneWidget);
   });
 }
