@@ -1,9 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 import '../models/daily_gitsawe.dart';
-import 'gitsawe_service.dart';
 
 /// Background callback for widget interaction (e.g. refresh button on Verse widget)
 @pragma('vm:entry-point')
