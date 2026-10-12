@@ -10,7 +10,7 @@ android {
     // REMOVED: buildFeatures { compose = true }
 
     compileSdk = 36
-    ndkVersion = "30.0.15729638"
+    ndkVersion = "25.2.9519653" 
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
