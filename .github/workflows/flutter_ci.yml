@@ -11,38 +11,83 @@ jobs:
   analyze_and_test:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Free Disk Space (Ubuntu)
+        run: |
+          echo "Disk space before cleanup:"
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          echo "Disk space after cleanup:"
+          df -h
 
-      - uses: subosito/flutter-action@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
 
-      - run: flutter pub get
-      - run: flutter analyze
-      - run: flutter test --platform tester
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze code
+        run: flutter analyze
+
+      - name: Run unit and widget tests
+        run: flutter test --platform tester
 
   build_android:
     needs: analyze_and_test
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Free Disk Space (Ubuntu)
+        run: |
+          echo "Disk space before cleanup:"
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          echo "Disk space after cleanup:"
+          df -h
 
-      - uses: subosito/flutter-action@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
 
-      - uses: actions/setup-java@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - run: flutter pub get
-      - run: flutter build apk --release
-      - run: flutter build appbundle --release
+      - name: Accept Android SDK & NDK Licenses
+        run: |
+          yes | flutter doctor --android-licenses || true
+          yes | /usr/local/lib/android/sdk/tools/bin/sdkmanager --licenses || true
 
-      - uses: actions/upload-artifact@v4
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build APK Release
+        run: flutter build apk --release
+
+      - name: Build App Bundle Release
+        run: flutter build appbundle --release
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: gitsawe-release
           path: |
