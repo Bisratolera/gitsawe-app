@@ -1,0 +1,26 @@
+name: Deploy Shorebird Patch
+
+on:
+  push:
+    branches:
+      - main # Triggers when code is merged into main
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Setup Shorebird
+        uses: shorebirdtech/actions/setup-shorebird@v1
+        with:
+          shorebird-token: ${{ secrets.SHOREBIRD_TOKEN }}
+
+      - name: Deploy Android Patch
+        run: shorebird patch android --submit

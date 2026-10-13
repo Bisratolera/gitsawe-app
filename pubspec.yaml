@@ -80,27 +80,28 @@ flutter:
   # of being bundled — see lib/services/api_client.dart and
   # lib/services/gitsawe_service.dart. Only static app assets remain here.
   assets:
-  - assets/data/audio.json
-  - assets/data/audioCategories.json
-  - assets/data/audioKidassie.json
-  - assets/data/audioBooks.json
-  - assets/data/sinksar/
-  - assets/data/dailyGitsawe.json
-  - assets/data/feasts.json
-  - assets/data/months.json
-  - assets/data/mahlets.json
-  - assets/data/subFeasts.json
-  - assets/data/monthlyGitsawe.json
-  - assets/data/seasonalGitsawe.json
-  - assets/data/መላእክት.json
-  - assets/data/ቅዱሳን_ሐዋርያት.json
-  - assets/data/ቅዳሴ.json
-  - assets/data/ዓመታዊ_እና_ወርሃዊ_መታሰቢያ_በዓላት.json
-  - assets/images/splash.png
-  - assets/images/onboard1.png
-  - assets/images/onboard2.png
-  - assets/images/onboard3.png
-  - assets/fonts/NotoSansEthiopic.ttf
+    - assets/data/audio.json
+    - assets/data/audioCategories.json
+    - assets/data/audioKidassie.json
+    - assets/data/audioBooks.json
+    - assets/data/sinksar/
+    - assets/data/dailyGitsawe.json
+    - assets/data/feasts.json
+    - assets/data/months.json
+    - assets/data/mahlets.json
+    - assets/data/subFeasts.json
+    - assets/data/monthlyGitsawe.json
+    - assets/data/seasonalGitsawe.json
+    - assets/data/መላእክት.json
+    - assets/data/ቅዱሳን_ሐዋርያት.json
+    - assets/data/ቅዳሴ.json
+    - assets/data/ዓመታዊ_እና_ወርሃዊ_መታሰቢያ_በዓላት.json
+    - assets/images/splash.png
+    - assets/images/onboard1.png
+    - assets/images/onboard2.png
+    - assets/images/onboard3.png
+    - assets/fonts/NotoSansEthiopic.ttf
+    - shorebird.yaml
 
   fonts:
     - family: NotoSansEthiopic
@@ -143,23 +144,13 @@ flutter:
 
 # Configuration for flutter_native_splash
 flutter_native_splash:
-  color: "#2B1620"
-  image: assets/images/splash.png
-  android: true
-  ios: true
-  web: false
-  android_gravity: center
-  ios_content_mode: center
-  size: 200
-
-  # Add this section for Android 12 and newer devices:
+  color: "#2B1620" # የጀርባው ከለር (ነጭ)
+  image: assets/images/SplashLogo.png # ያዘጋጀኸው ምስል አድራሻ
   android_12:
-    color: "#2B1620"
-    image: assets/images/splash.png
-    size: 200
+    image: assets/images/SplashLogo.png # ለአንድሮይድ 12 እና ከዚያ በላይ
 
 flutter_launcher_icons:
-  android: "launcher_icon"
+  android: true
   ios: true
   image_path: "assets/icon/app_icon.png"
 
