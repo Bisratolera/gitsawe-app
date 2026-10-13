@@ -3,7 +3,17 @@ name: Deploy Shorebird Patch
 on:
   push:
     branches:
-      - master # Triggers when code is merged into main
+      - master
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Create the initial Shorebird release or publish a patch'
+        required: true
+        type: choice
+        options:
+          - release
+          - patch
+        default: patch
 
 jobs:
   patch:
@@ -25,8 +35,15 @@ jobs:
         with:
           cache: true # Optional: speeds up future runs
 
-      # CORRECTED: Uses the official shorebird-patch action
+      # Run this once to create the base release before publishing patches.
+      - name: 📦 Create Android Release
+        if: github.event_name == 'workflow_dispatch' && inputs.action == 'release'
+        run: shorebird release android
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+
       - name: 🚀 Deploy Android Patch
+        if: github.event_name == 'push' || inputs.action == 'patch'
         uses: shorebirdtech/shorebird-patch@v1
         with:
           platform: android

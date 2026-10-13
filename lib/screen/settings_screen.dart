@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:shorebird_code_push/shorebird_code_push.dart';
 
 import '../services/app_settings.dart';
 import '../services/gitsawe_service.dart';
@@ -98,6 +99,12 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
               _SettingsSection(
+                title: 'App Updates',
+                children: const [
+                  _OtaUpdateTile(),
+                ],
+              ),
+              _SettingsSection(
                 title: 'Storage',
                 children: [
                   ListTile(
@@ -125,6 +132,65 @@ class SettingsScreen extends StatelessWidget {
     if (scale > 1.15) return 'Large';
     if (scale > 1.05) return 'Medium large';
     return 'Medium';
+  }
+}
+
+class _OtaUpdateTile extends StatefulWidget {
+  const _OtaUpdateTile();
+
+  @override
+  State<_OtaUpdateTile> createState() => _OtaUpdateTileState();
+}
+
+class _OtaUpdateTileState extends State<_OtaUpdateTile> {
+  final ShorebirdUpdater _updater = ShorebirdUpdater();
+  bool _checking = false;
+
+  Future<void> _checkForUpdates() async {
+    if (_checking) return;
+    setState(() => _checking = true);
+
+    var message = 'Gitsawe is up to date.';
+    try {
+      if (!_updater.isAvailable) {
+        message = 'OTA updates are available only in Shorebird release builds.';
+      } else {
+        final status = await _updater.checkForUpdate();
+        if (status == UpdateStatus.outdated) {
+          await _updater.update();
+          message = 'Update downloaded. Restart Gitsawe to apply it.';
+        } else if (status == UpdateStatus.restartRequired) {
+          message = 'An update is ready. Restart Gitsawe to apply it.';
+        } else if (status == UpdateStatus.unavailable) {
+          message = 'OTA updates are unavailable in this build.';
+        }
+      }
+    } catch (error) {
+      message = 'Could not check for updates: $error';
+    } finally {
+      if (!mounted) return;
+      setState(() => _checking = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(IconsaxPlusLinear.refresh),
+      title: const Text('Check for updates'),
+      subtitle: const Text('Download the latest app patch'),
+      trailing: _checking
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Icon(IconsaxPlusLinear.arrow_right_3),
+      onTap: _checking ? null : _checkForUpdates,
+    );
   }
 }
 
