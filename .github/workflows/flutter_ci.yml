@@ -99,9 +99,9 @@ jobs:
             build/app/outputs/bundle/release/app-release.aab
           retention-days: 14
 
-      # 2. Added the step to automatically deploy a GitHub Release on every push to main
+      # 2. Added the step to automatically deploy a GitHub Release on every push to master
       - name: Create GitHub Release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: ncipollo/release-action@v1
         with:
           artifacts: |
