@@ -35,6 +35,20 @@ jobs:
         with:
           cache: true # Optional: speeds up future runs
 
+      - name: 🔐 Validate Shorebird API key
+        shell: bash
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+        run: |
+          if [[ -z "$SHOREBIRD_TOKEN" ]]; then
+            echo "::error::Missing GitHub Actions secret SHOREBIRD_TOKEN. Add a Shorebird API key (sb_api_...) under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          if [[ "$SHOREBIRD_TOKEN" != sb_api_* ]]; then
+            echo "::error::SHOREBIRD_TOKEN must be a Shorebird API key beginning with sb_api_; legacy CI tokens are no longer supported."
+            exit 1
+          fi
+
       # Run this once to create the base release before publishing patches.
       - name: 📦 Create Android Release
         if: github.event_name == 'workflow_dispatch' && inputs.action == 'release'
