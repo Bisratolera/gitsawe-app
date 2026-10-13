@@ -2,9 +2,9 @@ name: Flutter CI
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
   workflow_dispatch:
 
 # 1. Added explicit write permissions so GITHUB_TOKEN can create releases
