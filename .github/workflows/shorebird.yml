@@ -3,7 +3,7 @@ name: Deploy Shorebird Patch
 on:
   push:
     branches:
-      - main # Triggers when code is merged into main
+      - master # Triggers when code is merged into main
 
 jobs:
   patch:
