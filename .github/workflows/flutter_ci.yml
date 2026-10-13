@@ -7,6 +7,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# 1. Added explicit write permissions so GITHUB_TOKEN can create releases
+permissions:
+  contents: write
+
 jobs:
   analyze_and_test:
     runs-on: ubuntu-24.04
@@ -94,3 +98,16 @@ jobs:
             build/app/outputs/flutter-apk/app-release.apk
             build/app/outputs/bundle/release/app-release.aab
           retention-days: 14
+
+      # 2. Added the step to automatically deploy a GitHub Release on every push to main
+      - name: Create GitHub Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
+          tag: "v1.0.${{ github.run_number }}"
+          name: "Release v1.0.${{ github.run_number }}"
+          body: "Automated compilation release from GitHub Actions compile run #${{ github.run_number }}."
+          token: ${{ secrets.GITHUB_TOKEN }}
