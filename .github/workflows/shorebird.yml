@@ -9,18 +9,26 @@ jobs:
   patch:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: 📚 Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      # Setup Java because Android builds require it
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
         with:
-          channel: 'stable'
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: Setup Shorebird
-        uses: shorebirdtech/actions/setup-shorebird@v1
+      # CORRECTED: Pulls from the dedicated setup-shorebird repository
+      - name: 🐦 Setup Shorebird
+        uses: shorebirdtech/setup-shorebird@v1
         with:
-          shorebird-token: ${{ secrets.SHOREBIRD_TOKEN }}
+          cache: true # Optional: speeds up future runs
 
-      - name: Deploy Android Patch
-        run: shorebird patch android --submit
+      # CORRECTED: Uses the official shorebird-patch action
+      - name: 🚀 Deploy Android Patch
+        uses: shorebirdtech/shorebird-patch@v1
+        with:
+          platform: android
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
