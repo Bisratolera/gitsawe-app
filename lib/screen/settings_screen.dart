@@ -168,11 +168,12 @@ class _OtaUpdateTileState extends State<_OtaUpdateTile> {
     } catch (error) {
       message = 'Could not check for updates: $error';
     } finally {
-      if (!mounted) return;
-      setState(() => _checking = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      if (mounted) {
+        setState(() => _checking = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
     }
   }
 
