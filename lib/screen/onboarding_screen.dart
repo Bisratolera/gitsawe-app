@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../core/l10n/strings.dart';
 import '../core/theme/app_theme.dart';
+import '../services/app_settings.dart';
+import '../services/daily_refresh.dart';
+import '../services/notification_service.dart';
 import 'today_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -14,28 +18,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<OnboardingData> _pages = [
-    OnboardingData(
-      title: 'እንኳን ደህና መጡ',
-      description:
-          'ወደ ግጻዌ መተግበሪያ እንኳን በደህና መጡ። የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን የዕለት ንባባትን እዚህ ያገኛሉ።',
-      image: 'assets/images/onboard1.png',
-    ),
-    OnboardingData(
-      title: 'የዕለት ንባባት',
-      description: 'ምስባክ፣ ወንጌል፣ ቅዳሴና ስንክሳርን በየቀኑ በቀላሉ ይከታተሉ።',
-      image: 'assets/images/onboard2.png',
-    ),
-    OnboardingData(
-      title: 'ማኅሌትና በዓላት',
-      description: 'የወር በዓላትንና የማኅሌት ሥርዓታትን በማንኛውም ጊዜ ይመልከቱ።',
-      image: 'assets/images/onboard3.png',
-    ),
+  final List<OnboardingData> _pages = const [
+    OnboardingData(titleKey: 'onb1_title', descKey: 'onb1_desc', image: 'assets/images/onboard1.png'),
+    OnboardingData(titleKey: 'onb2_title', descKey: 'onb2_desc', image: 'assets/images/onboard2.png'),
+    OnboardingData(titleKey: 'onb3_title', descKey: 'onb3_desc', image: 'assets/images/onboard3.png'),
   ];
 
   Future<void> _completeOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_completed', true);
+
+    // Ask for notification permission now (not at first launch) so the user
+    // understands why, then schedule the daily reminders.
+    if (AppSettings.instance.notificationsEnabled) {
+      final granted = await NotificationService.instance.requestPermission();
+      if (!granted && NotificationService.instance.supportsRuntimePermission) {
+        await AppSettings.instance.setNotificationsEnabled(false);
+      }
+      await DailyRefresh.instance.syncReminders();
+    }
     if (mounted) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const TodayScreen()),
@@ -99,7 +100,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
                       child: Text(
-                        _currentPage == _pages.length - 1 ? 'ጀምር' : 'ቀጥል',
+                        tr(context, _currentPage == _pages.length - 1 ? 'start' : 'next'),
                         style: const TextStyle(fontSize: 18),
                       ),
                     ),
@@ -107,9 +108,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
                 TextButton(
                   onPressed: _completeOnboarding,
-                  child: const Text(
-                    'ዝለል (Skip)',
-                    style: TextStyle(color: AppColors.maroon),
+                  child: Text(
+                    tr(context, 'skip'),
+                    style: const TextStyle(color: Colors.white70),
                   ),
                 ),
               ],
@@ -127,20 +128,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       margin: const EdgeInsets.only(right: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
-        color: _currentPage == index ? Colors.white : AppColors.maroon,
+        color: _currentPage == index ? Colors.white : Colors.white30,
       ),
     );
   }
 }
 
 class OnboardingData {
-  final String title;
-  final String description;
+  final String titleKey;
+  final String descKey;
   final String image;
 
-  OnboardingData({
-    required this.title,
-    required this.description,
+  const OnboardingData({
+    required this.titleKey,
+    required this.descKey,
     required this.image,
   });
 }
@@ -152,15 +153,16 @@ class _OnboardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(40.0),
+    return SafeArea(
+      child: SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(40, 40, 40, 220),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.asset(data.image, height: 200),
           const SizedBox(height: 40),
           Text(
-            data.title,
+            tr(context, data.titleKey),
             style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
@@ -170,7 +172,7 @@ class _OnboardingPage extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            data.description,
+            tr(context, data.descKey),
             style: const TextStyle(
               fontSize: 16,
               color: Colors.white,
@@ -179,6 +181,7 @@ class _OnboardingPage extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
         ],
+      ),
       ),
     );
   }

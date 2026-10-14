@@ -11,16 +11,38 @@ void main() {
     await AppSettings.instance.load();
   });
 
-  test('loads default notification and language settings', () async {
-    expect(AppSettings.instance.notificationsEnabled, isTrue);
-    expect(AppSettings.instance.language, 'am');
+  test('loads defaults', () {
+    final s = AppSettings.instance;
+    expect(s.notificationsEnabled, isTrue);
+    expect(s.language, 'am');
+    expect(s.reminderHour, 7);
+    expect(s.reminderMinute, 0);
+    expect(s.textScale, 1.0);
   });
 
-  test('updates notification and language preferences', () async {
-    await AppSettings.instance.setNotificationsEnabled(false);
-    await AppSettings.instance.setLanguage('en');
+  test('persists notification, language and reminder time', () async {
+    final s = AppSettings.instance;
+    await s.setNotificationsEnabled(false);
+    await s.setLanguage('en');
+    await s.setReminderTime(18, 30);
 
-    expect(AppSettings.instance.notificationsEnabled, isFalse);
-    expect(AppSettings.instance.language, 'en');
+    SharedPreferences.setMockInitialValues({
+      'notifications_enabled': false,
+      'language': 'en',
+      'reminder_hour': 18,
+      'reminder_minute': 30,
+    });
+    await s.load();
+    expect(s.notificationsEnabled, isFalse);
+    expect(s.language, 'en');
+    expect(s.reminderHour, 18);
+    expect(s.reminderMinute, 30);
+  });
+
+  test('text scale is clamped', () async {
+    await AppSettings.instance.setTextScale(5);
+    expect(AppSettings.instance.textScale, AppSettings.maxTextScale);
+    await AppSettings.instance.setTextScale(0.1);
+    expect(AppSettings.instance.textScale, AppSettings.minTextScale);
   });
 }

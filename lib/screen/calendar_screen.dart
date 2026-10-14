@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import '../core/l10n/strings.dart';
 import '../services/gitsawe_service.dart';
 import 'calendar_detail_screen.dart';
 
 import '../widgets/screen_wrapper.dart';
 
+/// Lists the monthly Gitsawe readings, or — with [seasonal] — the seasonal
+/// ones (Nenewe, the Great Lent weeks, Easter season…).
 class CalendarScreen extends StatelessWidget {
-  const CalendarScreen({super.key});
+  final bool seasonal;
+
+  const CalendarScreen({super.key, this.seasonal = false});
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final entries = GitsaweService.instance.monthlyGitsawe;
+    final entries =
+        seasonal ? GitsaweService.instance.seasonalGitsawe : GitsaweService.instance.monthlyGitsawe;
 
     return ScreenWrapper(
-      currentIndex: 3,
-      title: 'የወር ግጻዌ',
+      currentIndex: seasonal ? -1 : 3,
+      title: tr(context, seasonal ? 'title_seasonal' : 'title_monthly'),
       body: entries.isEmpty
-          ? const Center(
+          ? Center(
               child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text('ምንም የወር ግጻዌ አልተገኘም።'),
+                padding: const EdgeInsets.all(16),
+                child: Text(tr(context, seasonal ? 'no_seasonal' : 'no_monthly')),
               ),
             )
           : ListView.builder(
@@ -28,9 +34,13 @@ class CalendarScreen extends StatelessWidget {
               itemCount: entries.length,
               itemBuilder: (context, i) {
                 final e = entries[i];
-                final date = e is Map ? (e['date'] ?? 'Unknown') : 'Unknown';
-                final title = e is Map ? (e['title'] ?? '') : '';
-                final mezmur = e is Map ? (e['mezmur'] ?? '') : '';
+                final title = e is Map ? (e['title'] ?? '').toString() : '';
+                final mezmur = e is Map ? (e['mezmur'] ?? '').toString() : '';
+                // Monthly entries carry a descriptive "date" (e.g. "ዘመስከረም ዮሐንስ");
+                // seasonal ones carry an internal key ("01-abiyTsom"), so show the title.
+                final rawDate = e is Map ? (e['date'] ?? '').toString() : '';
+                final heading = seasonal ? title : rawDate;
+                final subtitle = seasonal ? '' : title;
 
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
@@ -39,21 +49,21 @@ class CalendarScreen extends StatelessWidget {
                       if (e is Map<String, dynamic>) {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (_) => CalendarDetailScreen(entry: e),
+                            builder: (_) => CalendarDetailScreen(entry: e, seasonal: seasonal),
                           ),
                         );
                       }
                     },
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(20),
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colors.surface,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: colors.outlineVariant.withOpacity(0.45)),
+                        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.45)),
                         boxShadow: [
                           BoxShadow(
-                            color: colors.shadow.withOpacity(0.15),
+                            color: colors.shadow.withValues(alpha: 0.15),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -63,28 +73,28 @@ class CalendarScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                date,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: colors.primary,
+                              Expanded(
+                                child: Text(
+                                  heading,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: colors.primary,
+                                  ),
                                 ),
                               ),
                               Icon(IconsaxPlusLinear.arrow_right_3, color: colors.onSurfaceVariant),
                             ],
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            title,
-                            style: const TextStyle(fontSize: 14),
-                          ),
+                          if (subtitle.isNotEmpty) ...[
+                            const SizedBox(height: 6),
+                            Text(subtitle, style: const TextStyle(fontSize: 14)),
+                          ],
                           if (mezmur.isNotEmpty) ...[
                             const SizedBox(height: 8),
                             Text(
-                              'መዝሙር፦ $mezmur',
+                              '${tr(context, 'hymn')}፦ $mezmur',
                               style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
                             ),
                           ],

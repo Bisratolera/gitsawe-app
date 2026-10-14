@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 
+import '../core/l10n/strings.dart';
 import '../core/theme/app_theme.dart';
 import '../models/appostles.dart';
 import '../services/teaching_service.dart';
@@ -14,7 +15,7 @@ class TeachingsScreen extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return ScreenWrapper(
       currentIndex: 2,
-      title: 'ትምህርቶች',
+      title: tr(context, 'title_teachings'),
       body: FutureBuilder<void>(
         future: TeachingService.instance.load(),
         builder: (context, snapshot) {
@@ -24,10 +25,10 @@ class TeachingsScreen extends StatelessWidget {
 
           final docs = TeachingService.instance.documents;
           if (docs.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text('ምንም ትምህርቶች አልተገኙም።'),
+                padding: const EdgeInsets.all(16),
+                child: Text(tr(context, 'no_teachings')),
               ),
             );
           }
@@ -52,9 +53,9 @@ class TeachingsScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colors.surface,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.maroon.withOpacity(0.15)),
+                    border: Border.all(color: AppColors.maroon.withValues(alpha: 0.15)),
                   ),
                   child: Row(
                     children: [
@@ -62,7 +63,7 @@ class TeachingsScreen extends StatelessWidget {
                         width: 52,
                         height: 52,
                         decoration: BoxDecoration(
-                          color: AppColors.maroon.withOpacity(0.08),
+                          color: AppColors.maroon.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(IconsaxPlusLinear.book_1, color: AppColors.maroon),
@@ -82,7 +83,7 @@ class TeachingsScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              '${chapters.length} ክፍሎች',
+                              '${chapters.length} ${tr(context, 'sections')}',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: colors.onSurfaceVariant,
@@ -119,14 +120,15 @@ class TeachingDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            for (final section in document.sections) _buildSection(section),
+            for (final section in document.sections) _buildSection(context, section),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSection(Section section) {
+  Widget _buildSection(BuildContext context, Section section) {
+    final colors = Theme.of(context).colorScheme;
     final children = <Widget>[];
 
     for (final node in section.content) {
@@ -136,10 +138,10 @@ class TeachingDetailScreen extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 12),
             child: Text(
               node.text!,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 height: 1.7,
-                color: Colors.black87,
+                color: colors.onSurface,
               ),
             ),
           ),
@@ -154,7 +156,7 @@ class TeachingDetailScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 for (final item in node.items)
-                  _buildListItem(item, 0),
+                  _buildListItem(context, item, 0),
               ],
             ),
           ),
@@ -164,7 +166,7 @@ class TeachingDetailScreen extends StatelessWidget {
 
     final nested = <Widget>[];
     for (final child in section.subSections) {
-      nested.add(_buildSection(child));
+      nested.add(_buildSection(context, child));
     }
 
     return Padding(
@@ -191,7 +193,8 @@ class TeachingDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildListItem(ListItemNode item, int depth) {
+  Widget _buildListItem(BuildContext context, ListItemNode item, int depth) {
+    final colors = Theme.of(context).colorScheme;
     final indent = depth * 18.0;
     final children = <Widget>[];
 
@@ -206,7 +209,7 @@ class TeachingDetailScreen extends StatelessWidget {
               Expanded(
                 child: Text(
                   item.text,
-                  style: const TextStyle(fontSize: 14, height: 1.6, color: Colors.black87),
+                  style: TextStyle(fontSize: 14, height: 1.6, color: colors.onSurface),
                 ),
               ),
             ],
@@ -217,7 +220,7 @@ class TeachingDetailScreen extends StatelessWidget {
 
     if (item.children.isNotEmpty) {
       for (final child in item.children) {
-        children.add(_buildListItem(child, depth + 1));
+        children.add(_buildListItem(context, child, depth + 1));
       }
     }
 

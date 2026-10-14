@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import '../core/l10n/strings.dart';
 import '../core/theme/app_theme.dart';
+import '../core/utils/ethiopian_calendar.dart';
 import '../models/daily_gitsawe.dart';
 import '../services/gitsawe_service.dart';
 import '../widgets/gitsawe_view.dart';
@@ -12,16 +14,17 @@ class DailyGitsaweScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final english = LangScope.of(context) == 'en';
     final entries = GitsaweService.instance.allDaily;
 
     return ScreenWrapper(
       currentIndex: 1,
-      title: 'የየእለቱ ግጻዌ ማውጫ',
+      title: tr(context, 'title_daily'),
       body: entries.isEmpty
-          ? const Center(
+          ? Center(
               child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text('No daily Gitsawe entries available yet.'),
+                padding: const EdgeInsets.all(16),
+                child: Text(tr(context, 'no_daily')),
               ),
             )
           : ListView.builder(
@@ -29,6 +32,9 @@ class DailyGitsaweScreen extends StatelessWidget {
               itemCount: entries.length,
               itemBuilder: (context, index) {
                 final entry = entries[index];
+                final parts = entry.date.split('-');
+                final dayNumber = parts.isNotEmpty ? (int.tryParse(parts.first) ?? 1) : 1;
+                final monthNumber = parts.length > 1 ? (int.tryParse(parts[1]) ?? 1) : 1;
 
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
@@ -44,12 +50,12 @@ class DailyGitsaweScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colors.surface,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppColors.maroon.withOpacity(0.12)),
+                        border: Border.all(color: AppColors.maroon.withValues(alpha: 0.12)),
                         boxShadow: [
                           BoxShadow(
-                            color: colors.shadow.withOpacity(0.15),
+                            color: colors.shadow.withValues(alpha: 0.15),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           ),
@@ -62,22 +68,22 @@ class DailyGitsaweScreen extends StatelessWidget {
                             width: 72,
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             decoration: BoxDecoration(
-                              color: AppColors.maroon.withOpacity(0.08),
+                              color: AppColors.maroon.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Column(
                               children: [
                                 Text(
-                                  _dayNumber(entry.date),
+                                  '$dayNumber',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.maroon,
+                                    color: colors.primary,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  _monthName(entry.date),
+                                  ethiopianMonthName(monthNumber, english: english),
                                   style: TextStyle(
                                     fontSize: 11,
                                     color: colors.onSurfaceVariant,
@@ -114,7 +120,7 @@ class DailyGitsaweScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                          const Icon(IconsaxPlusLinear.arrow_right_3, color: AppColors.maroon),
+                          Icon(IconsaxPlusLinear.arrow_right_3, color: colors.primary),
                         ],
                       ),
                     ),
@@ -123,24 +129,6 @@ class DailyGitsaweScreen extends StatelessWidget {
               },
             ),
     );
-  }
-
-  String _dayNumber(String date) {
-    final parts = date.split('-');
-    if (parts.isEmpty) return '1';
-    final day = int.tryParse(parts.first) ?? 1;
-    return day.toString();
-  }
-
-  String _monthName(String date) {
-    final parts = date.split('-');
-    if (parts.length < 2) return 'Month';
-    final monthNumber = int.tryParse(parts[1]) ?? 1;
-    const months = [
-      'መስከረም', 'ጥቅምት', 'ህዳር', 'ታህሳስ', 'ጥርር', 'የካቲት', 'መጋቢት', 'ሚያዝያ',
-      'ግንቦት', 'ሰኔ', 'ሓምሌ', 'ነሃሴ', 'ጳጉሜ'
-    ];
-    return months[(monthNumber - 1).clamp(0, months.length - 1)];
   }
 }
 
@@ -151,14 +139,15 @@ class DailyGitsaweDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final english = LangScope.of(context) == 'en';
     return ScreenWrapper(
       currentIndex: 1,
-      title: 'Daily Details',
+      title: tr(context, 'title_daily_detail'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: GitsaweView(
           entry: entry,
-          dateLabel: entry.date,
+          dateLabel: formatDateKey(entry.date, english: english),
         ),
       ),
     );

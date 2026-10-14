@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 
+import '../core/l10n/strings.dart';
+import '../core/utils/ethiopian_calendar.dart';
 import '../services/bookmark_service.dart';
+import '../services/gitsawe_service.dart';
 import '../widgets/screen_wrapper.dart';
+import 'daily_gitsawe_screen.dart';
 
 class BookmarksScreen extends StatelessWidget {
   const BookmarksScreen({super.key});
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: BookmarkService.instance,
       builder: (context, child) {
         final bookmarks = BookmarkService.instance.bookmarks;
+        final english = LangScope.of(context) == 'en';
         return ScreenWrapper(
           currentIndex: -1,
-          title: 'የእኔ (Bookmarks)',
+          title: tr(context, 'title_bookmarks'),
           body: bookmarks.isEmpty
               ? Center(
                   child: Column(
@@ -22,9 +27,9 @@ class BookmarksScreen extends StatelessWidget {
                     children: [
                       Icon(Icons.bookmark_border, size: 64, color: Colors.grey[400]),
                       const SizedBox(height: 16),
-                      const Text('No bookmarks yet', style: TextStyle(fontSize: 18)),
+                      Text(tr(context, 'no_bookmarks'), style: const TextStyle(fontSize: 18)),
                       const SizedBox(height: 8),
-                      const Text('Your saved readings will appear here'),
+                      Text(tr(context, 'no_bookmarks_hint')),
                     ],
                   ),
                 )
@@ -37,9 +42,24 @@ class BookmarksScreen extends StatelessWidget {
                     return ListTile(
                       leading: const Icon(Icons.bookmark),
                       title: Text(bookmark.title),
-                      subtitle: Text(bookmark.date),
+                      subtitle: Text(formatDateKey(bookmark.date, english: english)),
+                      onTap: () {
+                        final entry = GitsaweService.instance
+                            .findByDateAndTitle(bookmark.date, bookmark.title);
+                        if (entry == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(tr(context, 'bookmark_missing'))),
+                          );
+                          return;
+                        }
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => DailyGitsaweDetailScreen(entry: entry),
+                          ),
+                        );
+                      },
                       trailing: IconButton(
-                        tooltip: 'Remove bookmark',
+                        tooltip: tr(context, 'remove_bookmark'),
                         icon: const Icon(Icons.delete_outline),
                         onPressed: () => BookmarkService.instance.toggle(bookmark),
                       ),

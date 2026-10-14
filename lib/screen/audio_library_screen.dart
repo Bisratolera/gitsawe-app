@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/l10n/strings.dart';
 import '../services/audio_library_service.dart';
 import '../models/audio.dart';
 import '../widgets/audio_play_button.dart';
@@ -30,7 +31,7 @@ class _AudioLibraryScreenState extends State<AudioLibraryScreen> {
     } catch (e, st) {
       debugPrint('Audio library load failed: $e\n$st');
       if (!mounted) return;
-      setState(() => _error = 'Could not load the audio library.');
+      setState(() => _error = 'error');
     }
   }
 
@@ -38,7 +39,7 @@ class _AudioLibraryScreenState extends State<AudioLibraryScreen> {
   Widget build(BuildContext context) {
     return ScreenWrapper(
       currentIndex: -1, // Not a main tab
-      title: 'ድምፅ ቤተ መጻሕፍት',
+      title: tr(context, 'title_audio'),
       body: _buildBody(),
     );
   }
@@ -51,9 +52,9 @@ class _AudioLibraryScreenState extends State<AudioLibraryScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(_error!, textAlign: TextAlign.center),
+              Text(tr(context, 'loading_error'), textAlign: TextAlign.center),
               const SizedBox(height: 16),
-              ElevatedButton(onPressed: _load, child: const Text('Retry')),
+              ElevatedButton(onPressed: _load, child: Text(tr(context, 'retry'))),
             ],
           ),
         ),
@@ -75,8 +76,8 @@ class _AudioLibraryScreenState extends State<AudioLibraryScreen> {
             final tracks = AudioLibraryService.instance.tracksOfFolder(folder.id);
             return ListTile(
               title: Text(folder.title),
-              subtitle: Text('${tracks.length} tracks'),
-              trailing: AudioPlayButton(tracks: tracks, label: 'አድምጥ'),
+              subtitle: Text('${tracks.length} ${tr(context, 'tracks')}'),
+              trailing: AudioPlayButton(tracks: tracks),
             );
           }).toList(),
         );

@@ -1,29 +1,38 @@
 import 'package:flutter/material.dart';
-import 'bookmarks_screen.dart';
-import 'settings_screen.dart';
-import 'about_screen.dart';
-import 'audio_library_screen.dart';
-import 'teachings_screen.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
-import '../services/gitsawe_service.dart';
+
+import '../core/app_info.dart';
+import '../core/l10n/strings.dart';
 import '../services/home_widget_service.dart';
 import '../services/missed_updates_service.dart';
 import '../services/share_service.dart';
 import '../widgets/screen_wrapper.dart';
+import 'about_screen.dart';
+import 'audio_library_screen.dart';
+import 'bookmarks_screen.dart';
+import 'calendar_screen.dart';
+import 'feasts_screen.dart';
+import 'privacy_screen.dart';
+import 'settings_screen.dart';
+import 'teachings_screen.dart';
 
 class MoreScreen extends StatelessWidget {
   const MoreScreen({super.key});
+
+  static void _open(BuildContext context, Widget screen) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
+  }
 
   @override
   Widget build(BuildContext context) {
     return ScreenWrapper(
       currentIndex: 6,
-      title: 'ተጨማሪ',
+      title: tr(context, 'title_more'),
       body: ListView(
         children: [
           ListTile(
             leading: const Icon(IconsaxPlusLinear.notification),
-            title: const Text('Missed updates'),
+            title: Text(tr(context, 'missed_updates')),
             trailing: ListenableBuilder(
               listenable: MissedUpdatesService.instance,
               builder: (_, _) {
@@ -43,138 +52,104 @@ class MoreScreen extends StatelessWidget {
             onTap: () => MissedUpdatesService.instance.showMissedSheet(context),
           ),
           ListTile(
-            leading: Icon(IconsaxPlusLinear.bookmark_2),
-            title: const Text('Bookmarks'),
-            onTap: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => const BookmarksScreen())),
+            leading: const Icon(IconsaxPlusLinear.bookmark_2),
+            title: Text(tr(context, 'title_bookmarks')),
+            onTap: () => _open(context, const BookmarksScreen()),
+          ),
+          ListTile(
+            leading: const Icon(Icons.event_repeat_outlined),
+            title: Text(tr(context, 'title_seasonal')),
+            onTap: () => _open(context, const CalendarScreen(seasonal: true)),
+          ),
+          ListTile(
+            leading: const Icon(Icons.celebration_outlined),
+            title: Text(tr(context, 'title_feasts')),
+            onTap: () => _open(context, const FeastsScreen()),
           ),
           ListTile(
             leading: const Icon(IconsaxPlusLinear.book),
-            title: const Text('Teachings'),
-            onTap: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => const TeachingsScreen())),
+            title: Text(tr(context, 'title_teachings')),
+            onTap: () => _open(context, const TeachingsScreen()),
           ),
           ListTile(
             leading: const Icon(IconsaxPlusLinear.music),
-            title: const Text('Audio Library'),
-            onTap: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => const AudioLibraryScreen())),
+            title: Text(tr(context, 'title_audio')),
+            onTap: () => _open(context, const AudioLibraryScreen()),
           ),
           ListTile(
             leading: const Icon(IconsaxPlusLinear.box_1),
-            title: const Text('Add home screen widget'),
-            subtitle: const Text('Choose from multiple Gitsawe widgets'),
-            onTap: () async {
-              showModalBottomSheet(
-                context: context,
-                builder: (context) {
-                  return SafeArea(
-                    child: Wrap(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Text(
-                            'የ መግብያ (Widget) ዓይነት ይምረጡ',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.article),
-                          title: const Text('የዕለቱ ንባብ እና ስንክሳር (Reading Widget)'),
-                          onTap: () async {
-                            Navigator.pop(context);
-                            final added = await HomeWidgetService.instance.requestPinWidget(
-                              androidName: 'GitsaweReadingWidgetProvider',
-                            );
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(added ? 'ንባብ መግብያ ተጠይቋል' : 'መግብያ መጠየቅ አልተቻለም')),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.menu_book),
-                          title: const Text('የዕለቱ ምስባክ እና ቃል (Verse Widget)'),
-                          onTap: () async {
-                            Navigator.pop(context);
-                            final added = await HomeWidgetService.instance.requestPinWidget(
-                              androidName: 'GitsaweVerseWidgetProvider',
-                            );
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(added ? 'ምስባክ መግብያ ተጠይቋል' : 'መግብያ መጠየቅ አልተቻለም')),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.widgets),
-                          title: const Text('መካከለኛ ግጻዌ መግብያ (Medium Widget)'),
-                          onTap: () async {
-                            Navigator.pop(context);
-                            final added = await HomeWidgetService.instance.requestPinWidget(
-                              androidName: 'GitsaweWidgetMediumProvider',
-                            );
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(added ? 'መካከለኛ መግብያ ተጠይቋል' : 'መግብያ መጠየቅ አልተቻለም')),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.view_compact),
-                          title: const Text('ጥቅል ግጻዌ መግብያ (Compact Widget)'),
-                          onTap: () async {
-                            Navigator.pop(context);
-                            final added = await HomeWidgetService.instance.requestPinWidget(
-                              androidName: 'GitsaweWidgetCompactProvider',
-                            );
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(added ? 'ጥቅል መግብያ ተጠይቋል' : 'መግብያ መጠየቅ አልተቻለም')),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
+            title: Text(tr(context, 'more_widget')),
+            subtitle: Text(tr(context, 'more_widget_sub')),
+            onTap: () => _showWidgetPicker(context),
           ),
           ListTile(
             leading: const Icon(IconsaxPlusLinear.setting),
-            title: const Text('Settings'),
-            onTap: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => const SettingsScreen())),
+            title: Text(tr(context, 'title_settings')),
+            onTap: () => _open(context, const SettingsScreen()),
           ),
           ListTile(
             leading: const Icon(IconsaxPlusLinear.share),
-            title: const Text('Share Gitsawe app'),
+            title: Text(tr(context, 'share_app')),
             onTap: () => ShareService.shareText(
               context,
-              'Gitsawe — Ethiopian Orthodox daily readings, hymns, and liturgy. https://github.com/Bisratolera/gitsawe-app',
+              '${tr(context, 'share_app_text')} ${AppInfo.repoUrl}',
             ),
           ),
           ListTile(
-            leading: const Icon(IconsaxPlusLinear.trash),
-            title: const Text('Clear cache'),
-            subtitle: const Text('Refetches today\'s reading and audio index'),
-            onTap: () async {
-              await GitsaweService.instance.clearCache();
-              if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Cache cleared — data will refetch.')),
-              );
-            },
+            leading: const Icon(Icons.privacy_tip_outlined),
+            title: Text(tr(context, 'title_privacy')),
+            onTap: () => _open(context, const PrivacyScreen()),
           ),
           ListTile(
             leading: const Icon(IconsaxPlusLinear.info_circle),
-            title: const Text('About'),
-            onTap: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => const AboutScreen())),
+            title: Text(tr(context, 'title_about')),
+            onTap: () => _open(context, const AboutScreen()),
           ),
         ],
       ),
+    );
+  }
+
+  static const List<({String android, IconData icon, String labelKey})> _widgets = [
+    (android: 'GitsaweReadingWidgetProvider', icon: Icons.article, labelKey: 'widget_reading'),
+    (android: 'GitsaweVerseWidgetProvider', icon: Icons.menu_book, labelKey: 'widget_verse'),
+    (android: 'GitsaweWidgetMediumProvider', icon: Icons.widgets, labelKey: 'widget_medium'),
+    (android: 'GitsaweWidgetCompactProvider', icon: Icons.view_compact, labelKey: 'widget_compact'),
+  ];
+
+  void _showWidgetPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  tr(sheetContext, 'widget_pick'),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              for (final w in _widgets)
+                ListTile(
+                  leading: Icon(w.icon),
+                  title: Text(tr(sheetContext, w.labelKey)),
+                  onTap: () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    final okText = tr(context, 'widget_requested');
+                    final failText = tr(context, 'widget_failed');
+                    Navigator.pop(sheetContext);
+                    final added = await HomeWidgetService.instance.requestPinWidget(
+                      androidName: w.android,
+                    );
+                    messenger.showSnackBar(SnackBar(content: Text(added ? okText : failText)));
+                  },
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

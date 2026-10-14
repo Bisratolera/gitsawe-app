@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../core/app_info.dart';
+import '../core/l10n/strings.dart';
 import '../core/theme/app_theme.dart';
 import '../widgets/gitsawe_app_bar.dart';
+import 'privacy_screen.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
+
+  Future<void> _copy(BuildContext context, String text) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final copied = tr(context, 'about_copied');
+    await Clipboard.setData(ClipboardData(text: text));
+    messenger.showSnackBar(SnackBar(content: Text(copied)));
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.maroonDark,
-      appBar: GitsaweAppBar(title: 'About', showBackArrow: true),
+      appBar: GitsaweAppBar(title: tr(context, 'title_about'), showBackArrow: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(32, 40, 32, 24),
@@ -26,35 +37,54 @@ class AboutScreen extends StatelessWidget {
                 child: Image.asset('assets/images/splash.png', color: Colors.white),
               ),
               const SizedBox(height: 28),
-              const Text(
-                'About Gitsawe',
-                style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+              Text(
+                tr(context, 'about_heading'),
+                style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
-              const Text(
-                'Gitsawe is a liturgical companion for the Ethiopian Orthodox '
-                'Tewahedo Church. It brings together daily readings, hymns, '
-                'Mahilet, Seatat, and Kidan in one place—helping you stay '
-                'connected to the rhythm of the Church calendar.',
+              Text(
+                tr(context, 'about_p1'),
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white70, fontSize: 15, height: 1.6),
+                style: const TextStyle(color: Colors.white70, fontSize: 15, height: 1.6),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Use it to follow Bible readings, reflect on daily prayers, '
-                'and keep the liturgy close to your heart.',
+              Text(
+                tr(context, 'about_p2'),
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white70, fontSize: 15, height: 1.6),
-              ),
-              const SizedBox(height: 60),
-              const Divider(color: Colors.white24),
-              const SizedBox(height: 12),
-              const ListTile(
-                title: Text('Version', style: TextStyle(color: Colors.white70)),
-                trailing: Text('1.0.0', style: TextStyle(color: Colors.white)),
+                style: const TextStyle(color: Colors.white70, fontSize: 15, height: 1.6),
               ),
               const SizedBox(height: 40),
+              const Divider(color: Colors.white24),
+              ListTile(
+                title: Text(tr(context, 'about_version'), style: const TextStyle(color: Colors.white70)),
+                trailing: const Text(
+                  '${AppInfo.version} (${AppInfo.buildNumber})',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.privacy_tip_outlined, color: Colors.white70),
+                title: Text(tr(context, 'about_privacy'), style: const TextStyle(color: Colors.white)),
+                trailing: const Icon(Icons.chevron_right, color: Colors.white54),
+                onTap: () => Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => const PrivacyScreen())),
+              ),
+              ListTile(
+                leading: const Icon(Icons.code, color: Colors.white70),
+                title: Text(tr(context, 'about_source'), style: const TextStyle(color: Colors.white)),
+                subtitle: const Text(AppInfo.repoUrl, style: TextStyle(color: Colors.white54, fontSize: 12)),
+                trailing: const Icon(Icons.copy, color: Colors.white54, size: 18),
+                onTap: () => _copy(context, AppInfo.repoUrl),
+              ),
+              ListTile(
+                leading: const Icon(Icons.bug_report_outlined, color: Colors.white70),
+                title: Text(tr(context, 'about_report'), style: const TextStyle(color: Colors.white)),
+                subtitle: const Text(AppInfo.issuesUrl, style: TextStyle(color: Colors.white54, fontSize: 12)),
+                trailing: const Icon(Icons.copy, color: Colors.white54, size: 18),
+                onTap: () => _copy(context, AppInfo.issuesUrl),
+              ),
+              const SizedBox(height: 32),
               const Text(
                 'developed in love by @thesudoguy',
                 style: TextStyle(color: Colors.white38, fontFamily: 'monospace', fontSize: 13),

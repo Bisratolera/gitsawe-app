@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gitsawe/core/theme/app_theme.dart';
+import '../core/theme/app_theme.dart';
 import 'app_sidebar.dart';
 import 'app_bottom_nav.dart';
 import 'mini_player_bar.dart';
@@ -36,7 +36,7 @@ class ScreenWrapper extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),
@@ -58,7 +58,9 @@ class ScreenWrapper extends StatelessWidget {
     return Scaffold(
       extendBody: true,
       backgroundColor: AppColors.maroon,
-      appBar: showHeader ? GitsaweAppBar(title: title, showBackArrow: true,) : null,
+      appBar: showHeader
+          ? GitsaweAppBar(title: title, showBackArrow: Navigator.of(context).canPop())
+          : null,
       drawer: AppSidebar(currentIndex: currentIndex),
       body: Padding(
         padding: const EdgeInsets.only(bottom: 40),

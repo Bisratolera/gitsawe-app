@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/l10n/strings.dart';
 import '../core/theme/app_theme.dart';
 import '../models/daily_gitsawe.dart';
 import '../models/verse.dart';
@@ -10,12 +11,12 @@ import '../services/share_service.dart';
 import 'audio_play_button.dart';
 import 'sinksar_section.dart';
 
-const Map<String, String> _partLabels = {
-  'msbak': 'ምስባክ',
-  'firstDeacon': 'ቀዳማይ ንባብ (፩ኛ ዲያቆን)',
-  'secondDeacon': 'ካልዓይ ንባብ (፪ኛ ዲያቆን)',
-  'secondKahn': 'የ፪ኛው ካህን ንባብ',
-  'wengel': 'ወንጌል',
+const Map<String, String> _partLabelKeys = {
+  'msbak': 'part_msbak',
+  'firstDeacon': 'part_first',
+  'secondDeacon': 'part_second',
+  'secondKahn': 'part_kahn',
+  'wengel': 'part_wengel',
 };
 
 class ManuscriptCard extends StatelessWidget {
@@ -32,7 +33,7 @@ class ManuscriptCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: colors.outlineVariant.withOpacity(0.45)),
+        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.45)),
       ),
       child: child,
     );
@@ -80,13 +81,13 @@ class ReadingCard extends StatelessWidget {
                 if (audioTrack != null)
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
-                    child: AudioPlayButton(tracks: [audioTrack], label: 'አድምጥ'),
+                    child: AudioPlayButton(tracks: [audioTrack]),
                   ),
                 if (ref.isNotEmpty)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.maroon.withOpacity(0.08),
+                      color: AppColors.maroon.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(ref, style: TextStyle(fontSize: 12, color: colors.primary)),
@@ -95,14 +96,14 @@ class ReadingCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          if (t.geez.isNotEmpty) _TaggedText(tag: 'ግዕዝ', text: t.geez),
+          if (t.geez.isNotEmpty) _TaggedText(tag: tr(context, 'tag_geez'), text: t.geez),
           if (t.amharic.isNotEmpty) ...[
             const SizedBox(height: 12),
-            _TaggedText(tag: 'አማርኛ', text: t.amharic),
+            _TaggedText(tag: tr(context, 'tag_amharic'), text: t.amharic),
           ],
           if (t.english.isNotEmpty) ...[
             const SizedBox(height: 12),
-            _TaggedText(tag: 'English', text: t.english, italic: true, muted: true),
+            _TaggedText(tag: tr(context, 'tag_english'), text: t.english, italic: true, muted: true),
           ],
         ],
       ),
@@ -173,7 +174,7 @@ class SectionBlock extends StatelessWidget {
     for (final key in partOrder) {
       final readings = byKey[key] ?? const <Verse>[];
       for (var i = 0; i < readings.length; i++) {
-        final label = '${_partLabels[key]}${readings.length > 1 ? ' ${i + 1}' : ''}';
+        final label = '${tr(context, _partLabelKeys[key]!)}${readings.length > 1 ? ' ${i + 1}' : ''}';
         cards.add(ReadingCard(reading: readings[i], label: label));
       }
     }
@@ -193,7 +194,7 @@ class SectionBlock extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Expanded(child: Divider(color: AppColors.maroon.withOpacity(0.2))),
+            Expanded(child: Divider(color: AppColors.maroon.withValues(alpha: 0.2))),
           ],
         ),
         const SizedBox(height: 16),
@@ -208,7 +209,7 @@ class SectionBlock extends StatelessWidget {
                     decoration: BoxDecoration(
                     border: Border(bottom: BorderSide(color: colors.outlineVariant)),
                   ),
-                  child: Text('ቅዳሴ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: colors.primary)),
+                  child: Text(tr(context, 'kidassie'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: colors.primary)),
                 ),
                 const SizedBox(height: 12),
                 Wrap(
@@ -240,9 +241,9 @@ class _KidassieChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: AppColors.maroon.withOpacity(0.06),
+        color: AppColors.maroon.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.maroon.withOpacity(0.2)),
+        border: Border.all(color: AppColors.maroon.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -265,7 +266,19 @@ class GitsaweView extends StatefulWidget {
   final DailyGitsawe entry;
   final String? dateLabel;
 
-  const GitsaweView({super.key, required this.entry, this.dateLabel});
+  /// Show the Synaxarium archive section for this DD-MM date.
+  final bool showSinksar;
+
+  /// Show the row of shortcut counters (daily / monthly / seasonal / …).
+  final bool showStats;
+
+  const GitsaweView({
+    super.key,
+    required this.entry,
+    this.dateLabel,
+    this.showSinksar = true,
+    this.showStats = true,
+  });
 
   @override
   State<GitsaweView> createState() => _GitsaweViewState();
@@ -307,13 +320,14 @@ class _GitsaweViewState extends State<GitsaweView> {
     addToQueue(widget.entry.negh);
     addToQueue(widget.entry.kidassie);
 
-    final currentMonthStr = sinksarDate.length > 1 ? sinksarDate[1] : '';
 
     final wholeReading = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _StatsHeader(currentMonth: currentMonthStr),
-        const SizedBox(height: 24),
+        if (widget.showStats) ...[
+          const _StatsHeader(),
+          const SizedBox(height: 24),
+        ],
         ManuscriptCard(
           padding: const EdgeInsets.all(24),
           child: Column(
@@ -339,7 +353,7 @@ class _GitsaweViewState extends State<GitsaweView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
-                        tooltip: bookmarked ? 'Remove bookmark' : 'Bookmark reading',
+                        tooltip: tr(context, bookmarked ? 'remove_bookmark' : 'bookmark'),
                         icon: Icon(bookmarked ? Icons.bookmark : Icons.bookmark_border),
                         color: colors.primary,
                         onPressed: () => BookmarkService.instance.toggle(
@@ -347,7 +361,7 @@ class _GitsaweViewState extends State<GitsaweView> {
                         ),
                       ),
                       IconButton(
-                        tooltip: 'Share reading',
+                        tooltip: tr(context, 'share_reading'),
                         icon: const Icon(Icons.share_outlined),
                         color: colors.primary,
                         onPressed: () => _shareText(context),
@@ -360,7 +374,7 @@ class _GitsaweViewState extends State<GitsaweView> {
               if (playAllQueue.isNotEmpty)
                 AudioPlayButton(
                   tracks: playAllQueue,
-                  label: 'ንባባቱን በተራ አድምጥ (${playAllQueue.length})',
+                  label: '${tr(context, 'play_all')} (${playAllQueue.length})',
                 ),
             ],
           ),
@@ -370,11 +384,11 @@ class _GitsaweViewState extends State<GitsaweView> {
           Row(
             children: [
               Text(
-                'ስንክሳር',
+                tr(context, 'sinksar'),
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: colors.primary, fontFamily: 'NotoSansEthiopic'),
               ),
               const SizedBox(width: 12),
-              Expanded(child: Divider(color: AppColors.maroon.withOpacity(0.2))),
+              Expanded(child: Divider(color: AppColors.maroon.withValues(alpha: 0.2))),
             ],
           ),
           const SizedBox(height: 16),
@@ -416,10 +430,10 @@ class _GitsaweViewState extends State<GitsaweView> {
                 context,
                 _sinksarKey,
                 fileName: 'sinksar-${widget.entry.date}',
-                shareText: 'ስንክሳር — ${widget.entry.title}',
+                shareText: '${tr(context, 'sinksar')} — ${widget.entry.title}',
               ),
               icon: const Icon(Icons.share_outlined, size: 16),
-              label: const Text('ስንክሳር አጋራ'),
+              label: Text(tr(context, 'share_sinksar')),
               style: TextButton.styleFrom(foregroundColor: colors.primary),
             ),
           ),
@@ -429,7 +443,7 @@ class _GitsaweViewState extends State<GitsaweView> {
           RepaintBoundary(
             key: _misbakKey,
             child: SectionBlock(
-              title: 'ንባባተ ነግህ',
+              title: tr(context, 'negh_readings'),
               section: widget.entry.negh,
             ),
           ),
@@ -441,19 +455,19 @@ class _GitsaweViewState extends State<GitsaweView> {
                 context,
                 _misbakKey,
                 fileName: 'misbak-${widget.entry.date}',
-                shareText: 'ንባባተ ነግህ - ${widget.entry.title}',
+                shareText: '${tr(context, 'negh_readings')} - ${widget.entry.title}',
               ),
               icon: const Icon(Icons.share_outlined, size: 16),
-              label: const Text('ንባባተ ነግህ አጋራ'),
+              label: Text(tr(context, 'share_negh')),
               style: TextButton.styleFrom(foregroundColor: colors.primary),
             ),
           ),
         ],
         if (!widget.entry.kidassie.isEmpty) ...[
           const SizedBox(height: 40),
-          SectionBlock(title: 'ንባባተ ቅዳሴ', section: widget.entry.kidassie),
+          SectionBlock(title: tr(context, 'kidassie_readings'), section: widget.entry.kidassie),
         ],
-        if (month >= 1 && month <= 13) ...[
+        if (widget.showSinksar && month >= 1 && month <= 13) ...[
           const SizedBox(height: 40),
           SinksarSection(day: day, month: month),
         ],
@@ -468,9 +482,7 @@ class _GitsaweViewState extends State<GitsaweView> {
 }
 
 class _StatsHeader extends StatelessWidget {
-  final String currentMonth;
-
-  const _StatsHeader({required this.currentMonth});
+  const _StatsHeader();
 
   @override
   Widget build(BuildContext context) {
@@ -481,27 +493,27 @@ class _StatsHeader extends StatelessWidget {
         children: [
           _StatCard(
             count: service.allDaily.length,
-            label: 'የዕለት ግጻዌ',
+            label: tr(context, 'stat_daily'),
             onTap: () => Navigator.pushNamed(context, '/daily_gitsawe'),
           ),
           _StatCard(
             count: service.monthlyGitsawe.length,
-            label: 'የወር ግጻዌ',
+            label: tr(context, 'stat_monthly'),
             onTap: () => Navigator.pushNamed(context, '/monthly_gitsawe'),
           ),
           _StatCard(
             count: service.seasonalGitsawe.length,
-            label: 'የዘመን ግጻዌ',
+            label: tr(context, 'stat_seasonal'),
             onTap: () => Navigator.pushNamed(context, '/seasonal_gitsawe'),
           ),
           _StatCard(
-            count: service.feastsForMonth(currentMonth).length,
-            label: 'በዓላት',
+            count: service.feasts.length,
+            label: tr(context, 'stat_feasts'),
             onTap: () => Navigator.pushNamed(context, '/feasts'),
           ),
           _StatCard(
             count: service.mahlets.length,
-            label: 'ማኅሌት',
+            label: tr(context, 'stat_mahlet'),
             onTap: () => Navigator.pushNamed(context, '/mahlet'),
           ),
         ],
@@ -533,7 +545,7 @@ class _StatCard extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: colors.outlineVariant.withOpacity(0.45)),
+              border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.45)),
             ),
             child: Column(
               children: [

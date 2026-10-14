@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
-// import 'package:gitsawe/models/audio.dart';
-import 'package:gitsawe/screen/audio_library_screen.dart';
+import '../core/app_info.dart';
+import '../core/l10n/strings.dart';
 import '../core/theme/app_theme.dart';
-import '../screen/today_screen.dart';
-import '../screen/daily_gitsawe_screen.dart';
-import '../screen/teachings_screen.dart';
+import '../screen/audio_library_screen.dart';
+import '../screen/bookmarks_screen.dart';
 import '../screen/calendar_screen.dart';
+import '../screen/daily_gitsawe_screen.dart';
+import '../screen/feasts_screen.dart';
 import '../screen/mahlet_screen.dart';
-import '../screen/search_screen.dart';
 import '../screen/more_screen.dart';
+import '../screen/search_screen.dart';
+import '../screen/settings_screen.dart';
+import '../screen/teachings_screen.dart';
+import '../screen/today_screen.dart';
 
 class AppSidebar extends StatelessWidget {
   final int currentIndex;
@@ -55,12 +59,12 @@ class AppSidebar extends StatelessWidget {
                     letterSpacing: 1,
                   ),
                 ),
-                const Text(
-                  'Gitsawe Lectionary',
-                  style: TextStyle(
+                Text(
+                  tr(context, 'drawer_subtitle'),
+                  style: const TextStyle(
                     color: Colors.white70,
                     fontSize: 12,
-                    letterSpacing: 2,
+                    letterSpacing: 1,
                   ),
                 ),
               ],
@@ -73,57 +77,81 @@ class AppSidebar extends StatelessWidget {
                 _buildNavItem(
                   context,
                   icon: Icons.today_outlined,
-                  label: 'ዛሬ',
+                  label: tr(context, 'today'),
                   index: 0,
                   destination: const TodayScreen(),
                 ),
                 _buildNavItem(
                   context,
                   icon: Icons.calendar_view_day_outlined,
-                  label: 'Daily',
+                  label: tr(context, 'nav_daily'),
                   index: 1,
                   destination: const DailyGitsaweScreen(),
                 ),
                 _buildNavItem(
                   context,
                   icon: Icons.menu_book_rounded,
-                  label: 'ትምህርቶች',
+                  label: tr(context, 'nav_teachings'),
                   index: 2,
                   destination: const TeachingsScreen(),
                 ),
                 _buildNavItem(
                   context,
                   icon: Icons.calendar_month_outlined,
-                  label: 'የወር',
+                  label: tr(context, 'nav_monthly'),
                   index: 3,
                   destination: const CalendarScreen(),
                 ),
                 _buildNavItem(
                   context,
+                  icon: Icons.event_repeat_outlined,
+                  label: tr(context, 'nav_seasonal'),
+                  destination: const CalendarScreen(seasonal: true),
+                ),
+                _buildNavItem(
+                  context,
+                  icon: Icons.celebration_outlined,
+                  label: tr(context, 'nav_feasts'),
+                  destination: const FeastsScreen(),
+                ),
+                _buildNavItem(
+                  context,
                   icon: Icons.music_note_outlined,
-                  label: 'ማኅሌት',
+                  label: tr(context, 'nav_mahlet'),
                   index: 4,
                   destination: const MahletScreen(),
                 ),
                 _buildNavItem(
                   context,
                   icon: Icons.search_outlined,
-                  label: 'ፍለጋ',
+                  label: tr(context, 'nav_search'),
                   index: 5,
                   destination: const SearchScreen(),
                 ),
                 _buildNavItem(
                   context,
-                  icon: Icons.more_horiz_outlined,
-                  label: 'More',
-                  index: 6,
-                  destination: const MoreScreen(),
+                  icon: Icons.library_music_outlined,
+                  label: tr(context, 'nav_audio'),
+                  destination: const AudioLibraryScreen(),
                 ),
                 _buildNavItem(
                   context,
-                  icon: Icons.library_music_outlined,
-                  label: 'Audio Library',
-                  destination: const AudioLibraryScreen(),
+                  icon: Icons.bookmark_border,
+                  label: tr(context, 'title_bookmarks'),
+                  destination: const BookmarksScreen(),
+                ),
+                _buildNavItem(
+                  context,
+                  icon: Icons.settings_outlined,
+                  label: tr(context, 'title_settings'),
+                  destination: const SettingsScreen(),
+                ),
+                _buildNavItem(
+                  context,
+                  icon: Icons.more_horiz_outlined,
+                  label: tr(context, 'nav_more'),
+                  index: 6,
+                  destination: const MoreScreen(),
                 ),
               ],
             ),
@@ -131,7 +159,7 @@ class AppSidebar extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
-              'Version 1.0.0',
+              'v${AppInfo.version}',
               style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ),
@@ -156,8 +184,6 @@ class AppSidebar extends StatelessWidget {
         height: 36,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          // Fills the icon's background box with the SAME color as the
-          // icon itself when selected, instead of leaving it transparent/white.
           color: isSelected ? colors.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
         ),

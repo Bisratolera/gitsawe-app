@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../models/sinksar.dart';
 
@@ -15,7 +16,7 @@ class SinksarService {
       final jsonStr = await rootBundle.loadString('assets/data/sinksar/manifest.json');
       manifest = SinksarManifest.fromJson(json.decode(jsonStr));
     } catch (e) {
-      print('Error loading Sinksar manifest: $e');
+      debugPrint('Error loading Sinksar manifest: $e');
     }
   }
 
@@ -28,7 +29,7 @@ class SinksarService {
       _cache[month] = m;
       return m;
     } catch (e) {
-      print('Error loading Sinksar data for month $month: $e');
+      debugPrint('Error loading Sinksar data for month $month: $e');
       return null;
     }
   }

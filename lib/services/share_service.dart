@@ -7,6 +7,9 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../core/l10n/strings.dart';
+import 'app_settings.dart';
+
 class ShareService {
   const ShareService._();
 
@@ -60,7 +63,7 @@ class ShareService {
       debugPrint('shareWidgetAsImage failed: $e\n$st');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not create a shareable image.')),
+          SnackBar(content: Text(trLang(AppSettings.instance.language, 'share_image_failed'))),
         );
       }
     }
@@ -69,7 +72,7 @@ class ShareService {
   static Future<void> _copyFallback(ScaffoldMessengerState? messenger, String text) async {
     await Clipboard.setData(ClipboardData(text: text));
     messenger?.showSnackBar(
-      const SnackBar(content: Text('Sharing is unavailable. Text copied instead.')),
+      SnackBar(content: Text(trLang(AppSettings.instance.language, 'copied'))),
     );
   }
 }

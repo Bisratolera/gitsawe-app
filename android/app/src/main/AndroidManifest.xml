@@ -1,24 +1,31 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Notifications -->
+    <!-- Daily reading reminders (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Re-schedule reminders after the device restarts -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Audio streaming + background playback -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
-    
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
-    <!-- Exact scheduled notifications -->
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- Reschedule notifications after device reboot -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!--
+        Exact-alarm permissions (USE_EXACT_ALARM / SCHEDULE_EXACT_ALARM) were removed on
+        purpose: Google Play restricts them to alarm/calendar apps, and a daily reading
+        reminder does not need to-the-second precision.
+    -->
 
     <application
-        android:label="gitsawe"
+        android:label="@string/app_name"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="true"
+        android:usesCleartextTraffic="false"
+        android:enableOnBackInvokedCallback="true">
 
         <!-- Main Flutter Activity -->
         <activity
@@ -42,6 +49,7 @@
             </intent-filter>
 
         </activity>
+
         <service
             android:name="com.ryanheise.audioservice.AudioService"
             android:foregroundServiceType="mediaPlayback"
@@ -59,9 +67,11 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+
+        <!-- Home-screen widgets -->
         <receiver
             android:name=".GitsaweWidgetSmallProvider"
-            android:label="@string/widget_medium_name"
+            android:label="@string/widget_small_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -73,7 +83,7 @@
 
         <receiver
             android:name=".GitsaweWidgetCompactProvider"
-            android:label="@string/widget_medium_name"
+            android:label="@string/widget_compact_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -97,7 +107,7 @@
 
         <receiver
             android:name=".GitsaweWidgetLargeProvider"
-            android:label="@string/widget_medium_name"
+            android:label="@string/widget_large_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -109,7 +119,7 @@
 
         <receiver
             android:name=".GitsaweWidgetCustomProvider"
-            android:label="Gitsawe Custom"
+            android:label="@string/widget_custom_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -121,7 +131,7 @@
 
         <receiver
             android:name=".GitsaweReadingWidgetProvider"
-            android:label="ግጻዌ ንባብ"
+            android:label="@string/widget_reading_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -133,7 +143,7 @@
 
         <receiver
             android:name=".GitsaweVerseWidgetProvider"
-            android:label="ግጻዌ ምስባክ"
+            android:label="@string/widget_verse_name"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

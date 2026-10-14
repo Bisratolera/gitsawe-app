@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/l10n/strings.dart';
 import '../models/sinksar.dart';
 import '../services/sinksar_service.dart';
 import '../core/theme/app_theme.dart';
@@ -63,7 +64,7 @@ class _SinksarSectionState extends State<SinksarSection> {
         Row(
           children: [
             Text(
-              'ስንክሳር ንባብ',
+              tr(context, 'sinksar_reading'),
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -93,7 +94,7 @@ class _SinksarSectionState extends State<SinksarSection> {
               margin: const EdgeInsets.only(bottom: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: colors.outlineVariant.withOpacity(0.45)),
+                side: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.45)),
               ),
               color: colors.surfaceContainerHighest,
               child: Column(

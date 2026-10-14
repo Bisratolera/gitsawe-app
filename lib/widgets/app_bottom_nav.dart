@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import '../core/l10n/strings.dart';
 
 class AppBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -16,11 +17,11 @@ class AppBottomNav extends StatelessWidget {
       child: Container(
         height: 64,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -38,14 +39,14 @@ class AppBottomNav extends StatelessWidget {
             elevation: 0,
             backgroundColor: Colors.transparent,
             type: BottomNavigationBarType.fixed,
-            items: const [
-              BottomNavigationBarItem(icon: Icon(IconsaxPlusLinear.calendar), activeIcon: Icon(IconsaxPlusBold.calendar), label: 'የዛሬ'),
-              BottomNavigationBarItem(icon: Icon(IconsaxPlusLinear.calendar_2), activeIcon: Icon(IconsaxPlusBold.calendar_2), label: 'የየእለት'),
-              BottomNavigationBarItem(icon: Icon(IconsaxPlusLinear.book), activeIcon: Icon(IconsaxPlusBold.book), label: 'ትምህርቶች'),
-              BottomNavigationBarItem(icon: Icon(IconsaxPlusLinear.calendar_search), activeIcon: Icon(IconsaxPlusBold.calendar_search), label: 'የወር'),
-              BottomNavigationBarItem(icon: Icon(IconsaxPlusLinear.music), activeIcon: Icon(IconsaxPlusBold.music), label: 'ማኅሌት'),
-              BottomNavigationBarItem(icon: Icon(IconsaxPlusLinear.search_normal), activeIcon: Icon(IconsaxPlusBold.search_normal), label: 'ፍለጋ'),
-              BottomNavigationBarItem(icon: Icon(IconsaxPlusLinear.more), activeIcon: Icon(IconsaxPlusBold.more), label: 'ተጨማሪ'),
+            items: [
+              BottomNavigationBarItem(icon: const Icon(IconsaxPlusLinear.calendar), activeIcon: const Icon(IconsaxPlusBold.calendar), label: tr(context, 'nav_today')),
+              BottomNavigationBarItem(icon: const Icon(IconsaxPlusLinear.calendar_2), activeIcon: const Icon(IconsaxPlusBold.calendar_2), label: tr(context, 'nav_daily')),
+              BottomNavigationBarItem(icon: const Icon(IconsaxPlusLinear.book), activeIcon: const Icon(IconsaxPlusBold.book), label: tr(context, 'nav_teachings')),
+              BottomNavigationBarItem(icon: const Icon(IconsaxPlusLinear.calendar_search), activeIcon: const Icon(IconsaxPlusBold.calendar_search), label: tr(context, 'nav_monthly')),
+              BottomNavigationBarItem(icon: const Icon(IconsaxPlusLinear.music), activeIcon: const Icon(IconsaxPlusBold.music), label: tr(context, 'nav_mahlet')),
+              BottomNavigationBarItem(icon: const Icon(IconsaxPlusLinear.search_normal), activeIcon: const Icon(IconsaxPlusBold.search_normal), label: tr(context, 'nav_search')),
+              BottomNavigationBarItem(icon: const Icon(IconsaxPlusLinear.more), activeIcon: const Icon(IconsaxPlusBold.more), label: tr(context, 'nav_more')),
             ],
           ),
         ),

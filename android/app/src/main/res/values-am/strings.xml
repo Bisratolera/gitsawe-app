@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">ግጻዌ</string>
     <string name="widget_default_title">ገና አልተጫነም</string>
     <string name="widget_header_label">ግጻዌ</string>
+    <string name="widget_small_name">ግጻዌ ትንሽ</string>
+    <string name="widget_compact_name">ግጻዌ ጥቅል</string>
+    <string name="widget_medium_name">ግጻዌ ማጠቃለያ</string>
+    <string name="widget_large_name">ግጻዌ ትልቅ</string>
+    <string name="widget_custom_name">ግጻዌ ካሬ</string>
+    <string name="widget_reading_name">ግጻዌ ንባብ</string>
+    <string name="widget_verse_name">ግጻዌ ምስባክ</string>
 </resources>

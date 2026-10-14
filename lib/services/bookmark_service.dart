@@ -31,9 +31,15 @@ class BookmarkService extends ChangeNotifier {
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getStringList(_key) ?? [];
-    _bookmarks = raw
-        .map((value) => Bookmark.fromJson(jsonDecode(value) as Map<String, dynamic>))
-        .toList();
+    final loaded = <Bookmark>[];
+    for (final value in raw) {
+      try {
+        loaded.add(Bookmark.fromJson(jsonDecode(value) as Map<String, dynamic>));
+      } catch (e) {
+        debugPrint('BookmarkService: skipping unreadable bookmark: $e');
+      }
+    }
+    _bookmarks = loaded;
   }
 
   bool contains(String date, String title) {

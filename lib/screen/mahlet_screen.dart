@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/l10n/strings.dart';
 import '../services/gitsawe_service.dart';
 import '../models/mahlet.dart';
 import '../widgets/gitsawe_app_bar.dart';
@@ -16,12 +17,12 @@ class MahletScreen extends StatelessWidget {
 
     return ScreenWrapper(
       currentIndex: 4,
-      title: 'ሥርዓተ ማኅሌት',
+      title: tr(context, 'title_mahlet'),
       body: mahlets.isEmpty
-          ? const Center(
+          ? Center(
               child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text('ምንም ማኅሌት አልተገኘም።'),
+                padding: const EdgeInsets.all(16),
+                child: Text(tr(context, 'no_mahlet')),
               ),
             )
           : ListView.builder(
@@ -43,12 +44,12 @@ class MahletScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colors.surface,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: colors.outlineVariant.withOpacity(0.45)),
+                        border: Border.all(color: colors.outlineVariant.withValues(alpha: 0.45)),
                         boxShadow: [
                           BoxShadow(
-                            color: colors.shadow.withOpacity(0.15),
+                            color: colors.shadow.withValues(alpha: 0.15),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -76,7 +77,7 @@ class MahletScreen extends StatelessWidget {
                           if (mahlet.source != null && mahlet.source!.isNotEmpty) ...[
                             const SizedBox(height: 6),
                             Text(
-                              'ምንጭ፦ ${mahlet.source}',
+                              '${tr(context, 'source')}፦ ${mahlet.source}',
                               style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
                             ),
                           ],
@@ -110,7 +111,7 @@ class _MahletDetailScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: Text(
-                  'ምንጭ፦ ${mahlet.source}',
+                  '${tr(context, 'source')}፦ ${mahlet.source}',
                   style: TextStyle(fontSize: 14, color: colors.onSurfaceVariant),
                 ),
               ),
