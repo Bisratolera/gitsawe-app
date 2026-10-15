@@ -94,10 +94,11 @@ flutter:
   - assets/data/ቅዱሳን_ሐዋርያት.json
   - assets/data/ቅዳሴ.json
   - assets/data/ዓመታዊ_እና_ወርሃዊ_መታሰቢያ_በዓላት.json
-  - assets/images/splash.png
+  - assets/icon/app_icon.png
   - assets/images/onboard1.png
   - assets/images/onboard2.png
   - assets/images/onboard3.png
+  - assets/images/gitsaweLogo.png
   - assets/fonts/NotoSansEthiopic.ttf
   - shorebird.yaml
 
@@ -143,7 +144,7 @@ flutter:
 # Configuration for flutter_native_splash
 flutter_native_splash:
   color: "#2B1620"
-  image: assets/images/splash.png
+  image: assets/images/gitsaweLogo.png
   android: true
   ios: true
   web: false
@@ -153,7 +154,7 @@ flutter_native_splash:
   # Add this section for Android 12 and newer devices:
   android_12:
     color: "#2B1620"
-    image: assets/images/splash.png
+    image: assets/images/gitsaweLogo.png
 
 flutter_launcher_icons:
   android: "launcher_icon"
@@ -161,7 +162,7 @@ flutter_launcher_icons:
   image_path: "assets/icon/app_icon.png"
 
 icons_launcher:
-  image_path: "assets/icon/app_icon.png"
+  image_path: "assets/icon/gitsaweLogo.png"
   platforms:
     android:
       enable: true
