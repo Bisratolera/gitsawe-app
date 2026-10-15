@@ -40,6 +40,7 @@ class BookmarkService extends ChangeNotifier {
       }
     }
     _bookmarks = loaded;
+    notifyListeners();
   }
 
   bool contains(String date, String title) {
