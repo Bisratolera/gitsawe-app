@@ -99,6 +99,7 @@ flutter:
   - assets/images/onboard2.png
   - assets/images/onboard3.png
   - assets/fonts/NotoSansEthiopic.ttf
+  - shorebird.yaml
 
   fonts:
     - family: NotoSansEthiopic
@@ -148,13 +149,11 @@ flutter_native_splash:
   web: false
   android_gravity: center
   ios_content_mode: center
-  size: 200
 
   # Add this section for Android 12 and newer devices:
   android_12:
     color: "#2B1620"
     image: assets/images/splash.png
-    size: 200
 
 flutter_launcher_icons:
   android: "launcher_icon"
