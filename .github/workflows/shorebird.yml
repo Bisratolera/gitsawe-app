@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'lib/**'
+      - 'assets/**'
+      - 'pubspec.yaml'
   workflow_dispatch:
     inputs:
       action:
@@ -20,11 +24,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 📚 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Setup Java because Android builds require it
       - name: ☕ Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -57,9 +61,10 @@ jobs:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
 
       - name: 🚀 Deploy Android Patch
-        if: github.event_name == 'push' || inputs.action == 'patch'
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.action == 'patch')
         uses: shorebirdtech/shorebird-patch@v1
         with:
           platform: android
+          release-version: latest
         env:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
